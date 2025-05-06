@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "2025-05-06.md",
+                "file": "KindleHilight/小野壮彦-経営×人材の超プロが教える人を選ぶ技術.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "2025-05-06"
+              "title": "小野壮彦-経営×人材の超プロが教える人を選ぶ技術"
             }
           }
         ]
@@ -53,7 +53,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "小野",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -74,7 +74,8 @@
               "title": "ブックマーク"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
@@ -180,7 +181,7 @@
       "obsidian-kindle-plugin:Sync your Kindle highlights": false
     }
   },
-  "active": "b96b35d6dfdc9684",
+  "active": "9f8db381a91d4d7a",
   "lastOpenFiles": [
     "2025-05-06.md",
     "無題のファイル.canvas",
