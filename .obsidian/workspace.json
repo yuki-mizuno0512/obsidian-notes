@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "KindleHilight/小野壮彦-経営×人材の超プロが教える人を選ぶ技術.md",
+                "file": "2025-05-06.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "小野壮彦-経営×人材の超プロが教える人を選ぶ技術"
+              "title": "2025-05-06"
             }
           }
         ]
@@ -53,7 +53,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "小野",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -74,8 +74,7 @@
               "title": "ブックマーク"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
@@ -181,8 +180,11 @@
       "obsidian-kindle-plugin:Sync your Kindle highlights": false
     }
   },
-  "active": "9f8db381a91d4d7a",
+  "active": "b96b35d6dfdc9684",
   "lastOpenFiles": [
+    "2025-05-06.md",
+    "無題のファイル.canvas",
+    "KindleHilight/小野壮彦-経営×人材の超プロが教える人を選ぶ技術.md",
     "KindleHilight/井上一鷹-集中力　パフォーマンスを300倍にする働き方.md",
     "KindleHilight/グロービス経営大学院-グロービスMBAアカウンティング［改訂3版］.md",
     "KindleHilight/ＣＴＩジャパン、重松延寿-マンガでやさしくわかるコーチング.md",
@@ -191,7 +193,6 @@
     "KindleHilight/國分功一郎-目的への抵抗―シリーズ哲学講話―（新潮新書）.md",
     "KindleHilight/祥誉-図解 マッキンゼー流入社1年目問題解決の教科書.md",
     "KindleHilight/小林弘幸-整える習慣.md",
-    "KindleHilight/小野壮彦-経営×人材の超プロが教える人を選ぶ技術.md",
     "KindleHilight/最相葉月、増崎英明-胎児のはなし.md",
     "KindleHilight/さつき-バレットジャーナル　人生を変えるノート術.md",
     "KindleHilight/ナオキ-MBAより簡単で英語より大切な決算を読む習慣.md",
@@ -208,7 +209,6 @@
     "KindleHilight/尾石晴（ワーママはる）-ワーママはるのライフシフト習慣術.md",
     "KindleHilight/吉中みちる-赤ちゃんとママのベビーサイン.md",
     "KindleHilight/細谷功-仕事に生かす地頭力　──問題解決ピラミッドと９つのレッスン.md",
-    "KindleHilight/細谷功-「Why型思考」が仕事を変える 鋭いアウトプットを出せる人の「頭の使い方」.md",
     "KindleHilight",
     "file/01_Inbox/ああああ",
     "file/test2",
