@@ -2,7 +2,7 @@
   "amazonRegion": "japan",
   "highlightsFolder": "KindleHilight",
   "lastSyncMode": "amazon",
-  "isLoggedIn": false,
+  "isLoggedIn": true,
   "syncOnBoot": false,
   "downloadBookMetadata": true,
   "fileNameTemplate": "",
