@@ -11,10 +11,14 @@
             "id": "47e7ab3667c573f9",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "hiroの痕跡.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "新規タブ"
+              "title": "hiroの痕跡"
             }
           }
         ]
@@ -161,14 +165,16 @@
       "canvas:新規キャンバスを作成": false,
       "daily-notes:今日のデイリーノートを開く": false,
       "templates:テンプレートを挿入": false,
-      "command-palette:コマンドパレットを開く": false
+      "command-palette:コマンドパレットを開く": false,
+      "obsidian-git:Open Git source control": false
     }
   },
-  "active": "b96b35d6dfdc9684",
+  "active": "47e7ab3667c573f9",
   "lastOpenFiles": [
-    "file/01_Inbox/ああああ",
-    "file/ページ2.md",
     "file/テストページ.md",
+    "hiroの痕跡.md",
+    "file/ページ2.md",
+    "file/01_Inbox/ああああ",
     "file/test2",
     "file/0506ファイル.md",
     "file/01_Inbox",
