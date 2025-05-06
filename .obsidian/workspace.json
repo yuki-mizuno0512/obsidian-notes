@@ -191,11 +191,13 @@
       "daily-notes:今日のデイリーノートを開く": false,
       "templates:テンプレートを挿入": false,
       "command-palette:コマンドパレットを開く": false,
-      "obsidian-git:Open Git source control": false
+      "obsidian-git:Open Git source control": false,
+      "obsidian-kindle-plugin:Sync your Kindle highlights": false
     }
   },
   "active": "b96b35d6dfdc9684",
   "lastOpenFiles": [
+    "無題のフォルダ",
     "file/0506ファイル.md",
     "file/ページ2　ゆきさん.md",
     "file/hiroの痕跡２.md",
