@@ -11,14 +11,14 @@
             "id": "47e7ab3667c573f9",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "split-diff-view",
               "state": {
-                "file": "hiroの痕跡.md",
-                "mode": "source",
-                "source": false
+                "aFile": "file/hiroの痕跡２.md",
+                "bFile": "file/hiroの痕跡２.md",
+                "aRef": ""
               },
-              "icon": "lucide-file",
-              "title": "hiroの痕跡"
+              "icon": "diff",
+              "title": "Diff: hiroの痕跡２"
             }
           }
         ]
@@ -150,13 +150,23 @@
               "icon": "lucide-list",
               "title": "0506ファイルのアウトライン"
             }
+          },
+          {
+            "id": "e26f8d7f51f5f8d5",
+            "type": "leaf",
+            "state": {
+              "type": "git-view",
+              "state": {},
+              "icon": "git-pull-request",
+              "title": "Source Control"
+            }
           }
-        ]
+        ],
+        "currentTab": 4
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -171,8 +181,9 @@
   },
   "active": "47e7ab3667c573f9",
   "lastOpenFiles": [
-    "file/テストページ.md",
     "hiroの痕跡.md",
+    "file/hiroの痕跡２.md",
+    "file/テストページ.md",
     "file/ページ2.md",
     "file/01_Inbox/ああああ",
     "file/test2",
