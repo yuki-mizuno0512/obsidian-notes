@@ -1,6 +1,6 @@
 {
   "amazonRegion": "japan",
-  "highlightsFolder": "/",
+  "highlightsFolder": "KindleHilight",
   "lastSyncMode": "amazon",
   "isLoggedIn": false,
   "syncOnBoot": false,
