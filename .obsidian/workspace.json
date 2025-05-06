@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "file/ページ2.md",
+                "file": "file/ページ2　ゆきさん.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "ページ2"
+              "title": "ページ2　ゆきさん"
             }
           },
           {
@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "あああああっっｋ.md",
+                "file": "file/ページ2　ゆきさん.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "あああああっっｋ"
+              "title": "ページ2　ゆきさん"
             }
           }
         ],
@@ -181,8 +181,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -197,8 +196,8 @@
   },
   "active": "9f8db381a91d4d7a",
   "lastOpenFiles": [
-    "file/ページ2.md",
     "あああああっっｋ.md",
+    "file/ページ2　ゆきさん.md",
     "hiroの痕跡.md",
     "file/hiroの痕跡２.md",
     "file/テストページ.md",
