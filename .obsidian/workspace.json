@@ -8,20 +8,6 @@
         "type": "tabs",
         "children": [
           {
-            "id": "47e7ab3667c573f9",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "file/ページ2　ゆきさん.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "ページ2　ゆきさん"
-            }
-          },
-          {
             "id": "9f8db381a91d4d7a",
             "type": "leaf",
             "state": {
@@ -35,8 +21,7 @@
               "title": "小野壮彦-経営×人材の超プロが教える人を選ぶ技術"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -197,32 +182,32 @@
   },
   "active": "9f8db381a91d4d7a",
   "lastOpenFiles": [
-    "KindleHilight/熊平美香-リフレクション（REFLECTION） 自分とチームの成長を加速させる内省の技術.md",
-    "KindleHilight/淳-フィードバック入門 耳の痛いことを伝えて部下と職場を立て直す技術.md",
-    "KindleHilight/グロービス経営大学院-グロービスMBAアカウンティング［改訂3版］.md",
-    "KindleHilight/井上一鷹-集中力　パフォーマンスを300倍にする働き方.md",
-    "KindleHilight/素文-ファシリテーションの教科書―組織を活性化させるコミュニケーションとリーダーシップ.md",
-    "KindleHilight/ロバート・Ｃ・ヒギンズ、グロービス経営大学院-ファイナンシャル・マネジメント　改訂３版.md",
-    "KindleHilight/健一-定量分析の教科書―ビジネス数字力養成講座.md",
-    "KindleHilight/伊藤美佳、齊藤恵-マンガでよくわかる モンテッソーリ教育×ハーバード式 子どもの才能の伸ばし方.md",
-    "KindleHilight/隆生（序文）-HARD THINGS　答えがない難問と困難にきみはどう立ち向かうか.md",
-    "KindleHilight/滋比古-こうやって、考える。.md",
-    "KindleHilight/広志-使える　弁証法―ヘーゲルが分かればＩＴ社会の未来が見える.md",
-    "KindleHilight/水野学-センスは知識からはじまる.md",
-    "KindleHilight/惇生-プロフェッショナルの条件 はじめて読むドラッカー.md",
-    "KindleHilight/アンディ・プディコム(著)／満園真木(訳)-からっぽ！　10分間瞑想が忙しいココロを楽にする.md",
-    "KindleHilight/まゆみ-エースと呼ばれる人は何をしているのか.md",
-    "KindleHilight/長友佑都-［メンタルモンスター］になる。.md",
-    "KindleHilight/学-いちばん大切なのに誰も教えてくれない段取りの教科書.md",
-    "KindleHilight/希美-爆速成長マネジメント.md",
-    "KindleHilight/國貞克則-書いてマスター！　財務３表・実践ドリル.md",
-    "KindleHilight/聡子-地域主権という希望.md",
-    "KindleHilight/てぃ先生-子どもが伸びるスゴ技大全 カリスマ保育士てぃ先生の子育て〇×図鑑.md",
-    "KindleHilight/功-ＭＢＡオペレーション戦略.md",
-    "KindleHilight/美和-Who You Are（フーユーアー）君の真の言葉と行動こそが困難を生き抜くチームをつくる.md",
-    "KindleHilight/トーキョーハーバー-プロフェッショナリズムと問題解決の実践.md",
-    "KindleHilight/功-地頭力を鍛える.md",
-    "KindleHilight/野村克也-「問いかけ」からすべてはじまる.md",
+    "KindleHilight/最相葉月、増崎英明-胎児のはなし.md",
+    "KindleHilight/さつき-バレットジャーナル　人生を変えるノート術.md",
+    "KindleHilight/ナオキ-MBAより簡単で英語より大切な決算を読む習慣.md",
+    "KindleHilight/堀田はるな、堀田和子-子どもの才能を伸ばす最高の方法モンテッソーリ・メソッド―――「自律した子」の育て方すべて.md",
+    "KindleHilight/三郎-日記の魔力.md",
+    "KindleHilight/大石哲之-コンサルタントの読書術 確実に成果につながる戦略的読書のススメ.md",
+    "KindleHilight/精治-スタンフォード式　最高の睡眠.md",
+    "KindleHilight/和代-圧倒的に自由で快適な未来が手に入る！　勝間式ネオ・ライフハック１００.md",
+    "KindleHilight/えり-日本一売り上げるキャバ嬢の　指名され続ける力【電子特典付き】.md",
+    "KindleHilight/卓也-ソフトウェア・ファースト.md",
+    "KindleHilight/えみり-愛沢えみりの“一生可愛く、好きなことして自分らしく楽しく生きる！”45のマイルール.md",
+    "KindleHilight/雅之-習慣が10割.md",
+    "KindleHilight/和央-作るもの・作る人・作り方から学ぶ 採用・人事担当者のためのITエンジニアリングの基本がわかる本.md",
+    "KindleHilight/アービンジャー・インスティチュート-日常の小さなイライラから解放される「箱」の法則 感情に振りまわされない人生を選択する.md",
+    "KindleHilight/尾石晴（ワーママはる）-ワーママはるのライフシフト習慣術.md",
+    "KindleHilight/吉中みちる-赤ちゃんとママのベビーサイン.md",
+    "KindleHilight/細谷功-仕事に生かす地頭力　──問題解決ピラミッドと９つのレッスン.md",
+    "KindleHilight/細谷功-「Why型思考」が仕事を変える 鋭いアウトプットを出せる人の「頭の使い方」.md",
+    "KindleHilight/ジェームズ・クリアー、牛原眞弓-ジェームズ・クリアー式 複利で伸びる1つの習慣.md",
+    "KindleHilight/ニック・メータ、ダン・スタインマン、リンカーン・マーフィー、バーチャレクス・コンサルティング-カスタマーサクセス――サブスクリプション時代に求められる「顧客の成功」10の原則.md",
+    "KindleHilight/ハーバード・ビジネス・レビュー編集部、DIAMONDハーバード・ビジネス・レビュー編集部-ハーバード・ビジネス・レビュー ＨＲ論文ベスト11 人材育成・人事の教科書.md",
+    "KindleHilight/一条響、下村一喜-億女　売上モンスターキャバ嬢一条響のつくりかた.md",
+    "KindleHilight/清水悦子、神山潤-赤ちゃんにもママにも優しい安眠ガイド.md",
+    "KindleHilight/アンデシュ・ハンセン、久山葉子-スマホ脳（新潮新書） 『スマホ脳』シリーズ.md",
+    "KindleHilight/えみり-SNS時代の幸福論　ヘルタースケルターにならないための生き方.md",
+    "KindleHilight/茂木健一郎-孤独になると結果が出せる.md",
     "KindleHilight",
     "file/01_Inbox/ああああ",
     "file/test2",
