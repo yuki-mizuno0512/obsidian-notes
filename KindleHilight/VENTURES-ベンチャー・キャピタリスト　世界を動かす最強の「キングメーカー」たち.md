@@ -1,5 +1,5 @@
 ---
-tags: kindle
+tags: kindle, ベンチャー, ビジネス, 投資, 起業, 経営, リーダーシップ, 組織, 自己啓発
 kindle-sync:
   bookId: '6249'
   title: ベンチャー・キャピタリスト　世界を動かす最強の「キングメーカー」たち (NewsPicksパブリッシング)

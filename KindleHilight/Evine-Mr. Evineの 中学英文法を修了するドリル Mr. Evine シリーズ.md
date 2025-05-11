@@ -1,5 +1,5 @@
 ---
-tags: kindle
+tags: kindle, 英語, 教育, 学習, 文法, 自己啓発
 kindle-sync:
   bookId: '49618'
   title: Mr. Evineの 中学英文法を修了するドリル Mr. Evine シリーズ
@@ -22,7 +22,7 @@ kindle-sync:
 主要素でないということは、 英文中になくても文法上は問題ない ということです。 そこで文型解釈の観点からMは除外することにします。Mを（　）でくくってみましょう! — location: [314](kindle://book?action=open&asin=B00FEAN0GC&location=314) ^ref-24684
 
 ---
-In” “to” “on”などは、 前置詞 とよばれ、「 前置詞 ＋ 名詞」で出来るカタマリを 前置詞句 といいます。「 — location: [343](kindle://book?action=open&asin=B00FEAN0GC&location=343) ^ref-1838
+In" "to" "on"などは、 前置詞 とよばれ、「 前置詞 ＋ 名詞」で出来るカタマリを 前置詞句 といいます。「 — location: [343](kindle://book?action=open&asin=B00FEAN0GC&location=343) ^ref-1838
 
 ---
 SVC文型は、Cを除外すると意味の通る文にはならないんですね。 つまり Cは文型の骨組みとして必要な主要素 なのです! — location: [388](kindle://book?action=open&asin=B00FEAN0GC&location=388) ^ref-57690
@@ -85,7 +85,7 @@ a は「1つの」 を意味する単語であり、この部分を 他の数字
 Be — location: [1421](kindle://book?action=open&asin=B00FEAN0GC&location=1421) ^ref-10951
 
 ---
-文頭にDon’t を付けると 禁止 の表現になります。 — location: [1424](kindle://book?action=open&asin=B00FEAN0GC&location=1424) ^ref-41836
+文頭にDon't を付けると 禁止 の表現になります。 — location: [1424](kindle://book?action=open&asin=B00FEAN0GC&location=1424) ^ref-41836
 
 ---
 then ［at that time］ （その時）　など — location: [1541](kindle://book?action=open&asin=B00FEAN0GC&location=1541) ^ref-51398
@@ -139,7 +139,7 @@ be動詞の過去形＋動詞のing形 — location: [1776](kindle://book?action
 willを使った未来の表現は 単純未来 と呼ばれ、「will＋動詞の原形」 で 客観的な未来の予定や計画 を表現することができます。 — location: [1895](kindle://book?action=open&asin=B00FEAN0GC&location=1895) ^ref-46310
 
 ---
-No, he won’t. （いえ、しないだろう。） — location: [1907](kindle://book?action=open&asin=B00FEAN0GC&location=1907) ^ref-47386
+No, he won't. （いえ、しないだろう。） — location: [1907](kindle://book?action=open&asin=B00FEAN0GC&location=1907) ^ref-47386
 
 ---
 よく学校ではbe going to＝willと学びます。すでにその感覚が定着している人は多いですね。 でも、実はこの2つ、 全く同じ感覚で使うことはできません。 次の英文を比較してみましょう。 — location: [1909](kindle://book?action=open&asin=B00FEAN0GC&location=1909) ^ref-16408
@@ -178,7 +178,7 @@ some day（いつか） — location: [1946](kindle://book?action=open&asin=B00F
 would like は 何かを丁寧にお願いするとき に使います。 — location: [2044](kindle://book?action=open&asin=B00FEAN0GC&location=2044) ^ref-12880
 
 ---
-I’d like to speak to Mr.Williams about our schedule. — location: [2045](kindle://book?action=open&asin=B00FEAN0GC&location=2045) ^ref-36534
+I'd like to speak to Mr.Williams about our schedule. — location: [2045](kindle://book?action=open&asin=B00FEAN0GC&location=2045) ^ref-36534
 
 ---
 許可「…してよい」、 — location: [2049](kindle://book?action=open&asin=B00FEAN0GC&location=2049) ^ref-24349
@@ -187,10 +187,10 @@ I’d like to speak to Mr.Williams about our schedule. — location: [2045](kind
 The story can be true. （その話は真実で ありうる。） — location: [2062](kindle://book?action=open&asin=B00FEAN0GC&location=2062) ^ref-57104
 
 ---
-can’tが 強い否定 を表し、推測の意味で使われる mustの反対語として 使われることがあります。 — location: [2070](kindle://book?action=open&asin=B00FEAN0GC&location=2070) ^ref-26686
+can'tが 強い否定 を表し、推測の意味で使われる mustの反対語として 使われることがあります。 — location: [2070](kindle://book?action=open&asin=B00FEAN0GC&location=2070) ^ref-26686
 
 ---
-He can’t be foolish. — location: [2071](kindle://book?action=open&asin=B00FEAN0GC&location=2071) ^ref-11711
+He can't be foolish. — location: [2071](kindle://book?action=open&asin=B00FEAN0GC&location=2071) ^ref-11711
 
 ---
 He had to agree — location: [2081](kindle://book?action=open&asin=B00FEAN0GC&location=2081) ^ref-59462
@@ -223,7 +223,7 @@ forは 気持ちがある方向に向かって発信 されている感じ、to�
 along（…に沿って） — location: [2421](kindle://book?action=open&asin=B00FEAN0GC&location=2421) ^ref-11272
 
 ---
-とりあえず、不定詞と言えばこの形! 「to＋動詞の原形」 を押さえてください! — location: [2513](kindle://book?action=open&asin=B00FEAN0GC&location=2513) ^ref-14817
+とりあえず、不定詞と言えばこの形! "to＋動詞の原形" を押さえてください! — location: [2513](kindle://book?action=open&asin=B00FEAN0GC&location=2513) ^ref-14817
 
 ---
 ［1］ 名詞的用法「…すること」 ↓ 主語 （S）、目的語 （O）、補語 （C） になる — location: [2531](kindle://book?action=open&asin=B00FEAN0GC&location=2531) ^ref-1810
@@ -391,7 +391,7 @@ SVOO文型をSVO文型に書き換えた場合、 人の前にtoやforが必要�
 ［1］ too 形容詞 （ for 人） to V 「あまりに～で、（人は） V できない」 — location: [3399](kindle://book?action=open&asin=B00FEAN0GC&location=3399) ^ref-12354
 
 ---
-so 形容詞 that S can’t V 「とても～でSは V できない。」 — location: [3403](kindle://book?action=open&asin=B00FEAN0GC&location=3403) ^ref-55306
+so 形容詞 that S can't V 「とても～でSは V できない。」 — location: [3403](kindle://book?action=open&asin=B00FEAN0GC&location=3403) ^ref-55306
 
 ---
 tooは「とても」と訳すため、veryの感覚で使う人も多いですが、tooには 否定的で限度を越えたニュアンス があります — location: [3407](kindle://book?action=open&asin=B00FEAN0GC&location=3407) ^ref-61139
@@ -442,7 +442,7 @@ as soon as SV 「S が V するとすぐに」 — location: [3458](kindle://boo
 either A or B 「AかBのどちらか」 / neither A nor B 「AもBも…ない」 — location: [3462](kindle://book?action=open&asin=B00FEAN0GC&location=3462) ^ref-54718
 
 ---
-I’m afraid ［sure / glad］ that … 「…ではないかと思う。［きっと…だと思う / …で嬉しい］」 — location: [3467](kindle://book?action=open&asin=B00FEAN0GC&location=3467) ^ref-54924
+I'm afraid ［sure / glad］ that … 「…ではないかと思う。［きっと…だと思う / …で嬉しい］」 — location: [3467](kindle://book?action=open&asin=B00FEAN0GC&location=3467) ^ref-54924
 
 ---
 この疑問詞は 接続詞のように働き、「疑問詞＋SV」の語順で 目的語になる 名詞節のカタマリ を作ります。 疑問文 という名前が付いてはいますが、実際は疑問詞の形と意味を利用した 表現 で「…ですか?」と相手に尋ねる文ではないので注意! — location: [3479](kindle://book?action=open&asin=B00FEAN0GC&location=3479) ^ref-4154
@@ -577,7 +577,7 @@ then — location: [5219](kindle://book?action=open&asin=B00FEAN0GC&location=521
 合格点40点 — location: [5227](kindle://book?action=open&asin=B00FEAN0GC&location=5227) ^ref-36079
 
 ---
-このrainは一般動詞ですからIt wasn’t rain.では×。 — location: [5236](kindle://book?action=open&asin=B00FEAN0GC&location=5236) ^ref-6839
+このrainは一般動詞ですからIt wasn't rain.では×。 — location: [5236](kindle://book?action=open&asin=B00FEAN0GC&location=5236) ^ref-6839
 
 ---
 at that time. — location: [5243](kindle://book?action=open&asin=B00FEAN0GC&location=5243) ^ref-10663
@@ -604,7 +604,7 @@ a dayはこの場合、副詞として「…につき」 という意味にな�
 そこで一度have（has） toに置き換えて考える必要があります。 — location: [5440](kindle://book?action=open&asin=B00FEAN0GC&location=5440) ^ref-1027
 
 ---
-must not は 禁止、don’t（doesn’t） have to は 不必要 を意味することも大切です。 — location: [5446](kindle://book?action=open&asin=B00FEAN0GC&location=5446) ^ref-5165
+must not は 禁止、don't（doesn't） have to は 不必要 を意味することも大切です。 — location: [5446](kindle://book?action=open&asin=B00FEAN0GC&location=5446) ^ref-5165
 
 ---
 wantの丁寧な言い方がwould likeです。 — location: [5450](kindle://book?action=open&asin=B00FEAN0GC&location=5450) ^ref-51528
@@ -625,7 +625,7 @@ It is ... for人 to不定詞 — location: [5643](kindle://book?action=open&asin
 （3） SVO＋ 目的 を示すto finish...の文。このitは天気や時間を示す形式主語。 （この仕事を終わらせるのに1時間かかります。）（SVO） この表現は色んなパターンがあります。 It takes 人 me 時間 2 hours to get there. — location: [5681](kindle://book?action=open&asin=B00FEAN0GC&location=5681) ^ref-18692
 
 ---
-（3） Don’t give up going to Tokyo. （東京に行くのをあきらめるな。）（SVO） give up で 1つの他動詞 と考え、 動名詞を目的語 にします。英文は否定の命令文「…するな」ですね。 — location: [5714](kindle://book?action=open&asin=B00FEAN0GC&location=5714) ^ref-60537
+（3） Don't give up going to Tokyo. （東京に行くのをあきらめるな。）（SVO） give up で 1つの他動詞 と考え、 動名詞を目的語 にします。英文は否定の命令文「…するな」ですね。 — location: [5714](kindle://book?action=open&asin=B00FEAN0GC&location=5714) ^ref-60537
 
 ---
 また without -ingで「…せずに」 という意味ですね。 — location: [5757](kindle://book?action=open&asin=B00FEAN0GC&location=5757) ^ref-43817
@@ -649,19 +649,19 @@ SVを含む節で時を表し文全体を修飾する 副詞節 になってい�
 them all. — location: [5920](kindle://book?action=open&asin=B00FEAN0GC&location=5920) ^ref-9272
 
 ---
-（2）isn’t、useful、than — location: [5932](kindle://book?action=open&asin=B00FEAN0GC&location=5932) ^ref-51049
+（2）isn't、useful、than — location: [5932](kindle://book?action=open&asin=B00FEAN0GC&location=5932) ^ref-51049
 
 ---
 （4）three、times、as — location: [5933](kindle://book?action=open&asin=B00FEAN0GC&location=5933) ^ref-50814
 
 ---
-（5）can’t、as、fast、as — location: [5933](kindle://book?action=open&asin=B00FEAN0GC&location=5933) ^ref-5456
+（5）can't、as、fast、as — location: [5933](kindle://book?action=open&asin=B00FEAN0GC&location=5933) ^ref-5456
 
 ---
 （6）as、wide、as、his — location: [5934](kindle://book?action=open&asin=B00FEAN0GC&location=5934) ^ref-21740
 
 ---
-（1）Which、better、or （2）couldn’t、as、as — location: [5952](kindle://book?action=open&asin=B00FEAN0GC&location=5952) ^ref-64276
+（1）Which、better、or （2）couldn't、as、as — location: [5952](kindle://book?action=open&asin=B00FEAN0GC&location=5952) ^ref-64276
 
 ---
 （3）better、than （4）looks、much、older （5）harder、than、any、other — location: [5952](kindle://book?action=open&asin=B00FEAN0GC&location=5952) ^ref-26427
