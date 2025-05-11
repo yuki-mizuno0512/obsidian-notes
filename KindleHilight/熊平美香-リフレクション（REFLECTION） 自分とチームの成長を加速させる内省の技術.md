@@ -1,5 +1,5 @@
 ---
-tags: kindle
+tags: kindle, リフレクション, 内省, 成長, 自己啓発, チーム, ビジネス, 習慣, 振り返り
 kindle-sync:
   bookId: '6223'
   title: リフレクション（REFLECTION） 自分とチームの成長を加速させる内省の技術 (オリジナルフレームワークPPT・PDF特典付き)
