@@ -2,5 +2,6 @@
   "google-calendar",
   "obsidian-git",
   "obsidian-kindle-plugin",
-  "cursor-bridge"
+  "cursor-bridge",
+  "templater-obsidian"
 ]
