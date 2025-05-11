@@ -11,10 +11,14 @@
             "id": "9f8db381a91d4d7a",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "グラフビュー"
+              "type": "markdown",
+              "state": {
+                "file": "KindleHilight/細谷功-「Why型思考」が仕事を変える 鋭いアウトプットを出せる人の「頭の使い方」.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "細谷功-「Why型思考」が仕事を変える 鋭いアウトプットを出せる人の「頭の使い方」"
             }
           }
         ]
@@ -49,7 +53,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "tag:#睡眠",
+                "query": "tag:#問題解決",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -179,7 +183,7 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "bc75d0dfffe5adab",
+  "active": "9f8db381a91d4d7a",
   "lastOpenFiles": [
     "KindleHilight/尾石晴-やめる時間術.md",
     "KindleHilight/さつき-バレットジャーナル　人生を変えるノート術.md",

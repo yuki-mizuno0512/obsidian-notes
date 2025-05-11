@@ -1,5 +1,5 @@
 ---
-tags: kindle
+tags: kindle, 思考法, 問題解決, ビジネス, 自己啓発, 分析, 生産性, 習慣
 kindle-sync:
   bookId: '27156'
   title: 「Why型思考」が仕事を変える 鋭いアウトプットを出せる人の「頭の使い方」 (PHPビジネス新書)

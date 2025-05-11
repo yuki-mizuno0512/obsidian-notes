@@ -1,5 +1,5 @@
 ---
-tags: kindle
+tags: kindle, 思考法, クリティカルシンキング, ビジネス, 自己啓発, 分析, 生産性, 論理的思考, フレームワーク
 kindle-sync:
   bookId: '47053'
   title: グロービスMBAクリティカル・シンキング［改訂3版］
