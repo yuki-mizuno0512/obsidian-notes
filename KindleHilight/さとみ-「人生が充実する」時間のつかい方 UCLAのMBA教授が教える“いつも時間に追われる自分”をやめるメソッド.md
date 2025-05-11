@@ -1,8 +1,8 @@
 ---
-tags: kindle
+tags: kindle, 時間管理, 生産性, 自己啓発, 習慣, ライフスタイル, 目標設定, 振り返り
 kindle-sync:
   bookId: '33230'
-  title: 「人生が充実する」時間のつかい方 UCLAのMBA教授が教える“いつも時間に追われる自分”をやめるメソッド
+  title: 「人生が充実する」時間のつかい方 UCLAのMBA教授が教える"いつも時間に追われる自分"をやめるメソッド
   author: キャシー・ホームズ、松丸 さとみ
   asin: B0CF2CM3QX
   lastAnnotatedDate: '2024-06-28'
@@ -10,7 +10,7 @@ kindle-sync:
   highlightsCount: 4
 ---
 
-# 「人生が充実する」時間のつかい方 UCLAのMBA教授が教える“いつも時間に追われる自分”をやめるメソッド
+# 「人生が充実する」時間のつかい方 UCLAのMBA教授が教える"いつも時間に追われる自分"をやめるメソッド
 ![|300](https://m.media-amazon.com/images/I/81VUC3V0TrL.jpg)
 ## Metadata
 * Author: [キャシー・ホームズ、松丸 さとみ](https://www.amazon.comundefined)

@@ -1,5 +1,5 @@
 ---
-tags: kindle
+tags: kindle, 自己認識, 自己啓発, 成長, 心理学, ビジネス, 習慣, 自己分析, 生き方
 kindle-sync:
   bookId: '11408'
   title: insight(インサイト)――いまの自分を正しく知り、仕事と人生を劇的に変える自己認識の力

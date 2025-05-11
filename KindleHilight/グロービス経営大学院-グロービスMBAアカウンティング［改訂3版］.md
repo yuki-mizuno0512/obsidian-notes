@@ -1,5 +1,5 @@
 ---
-tags: kindle
+tags: kindle, 会計, ビジネス, 経営, 数字力, 分析, 自己啓発, ファイナンス, 実践
 kindle-sync:
   bookId: '65363'
   title: グロービスMBAアカウンティング［改訂3版］

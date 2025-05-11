@@ -1,5 +1,5 @@
 ---
-tags: kindle
+tags: kindle, 脳科学, 生産性, 自己啓発, 習慣, ビジネス, メンタルヘルス, 思考法, 働き方
 kindle-sync:
   bookId: '49873'
   title: 最高の脳で働く方法 Your Brain at Work（ユアブレイン アットワーク）
