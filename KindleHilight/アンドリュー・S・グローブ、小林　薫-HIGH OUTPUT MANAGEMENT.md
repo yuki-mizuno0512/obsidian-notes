@@ -1,5 +1,5 @@
 ---
-tags: kindle
+tags: kindle, 経営, マネジメント, リーダーシップ, 生産性, 組織, ビジネス, 自己啓発
 kindle-sync:
   bookId: '42934'
   title: HIGH OUTPUT MANAGEMENT

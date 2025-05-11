@@ -1,5 +1,5 @@
 ---
-tags: kindle
+tags: kindle, SNS, 幸福, 生き方, 自己啓発, メンタルヘルス, 人間関係, ライフスタイル, 現代社会
 kindle-sync:
   bookId: '30076'
   title: SNS時代の幸福論　ヘルタースケルターにならないための生き方
