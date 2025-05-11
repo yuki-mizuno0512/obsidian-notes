@@ -1,5 +1,5 @@
 ---
-tags: kindle
+tags: kindle, 会計, ビジネス, 分析, 経営, 自己啓発, 習慣, 実践, 数字力
 kindle-sync:
   bookId: '57281'
   title: MBAより簡単で英語より大切な決算を読む習慣
