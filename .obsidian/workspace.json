@@ -68,7 +68,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "tag:#分析",
+                "query": "tag:#GCPX",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -89,7 +89,8 @@
               "title": "ブックマーク"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
@@ -177,7 +178,7 @@
             }
           }
         ],
-        "currentTab": 3
+        "currentTab": 2
       }
     ],
     "direction": "horizontal",
@@ -197,7 +198,7 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "c76b3575bded9510",
+  "active": "bc75d0dfffe5adab",
   "lastOpenFiles": [
     "KindleHilight/Templates/kindle-book-template.md.md",
     "TA勉強会.md",
