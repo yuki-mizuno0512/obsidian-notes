@@ -68,7 +68,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "tag:#GCPX",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -110,7 +110,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0506ファイル.md",
+                "file": "TA勉強会.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -120,7 +120,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "0506ファイルへのバックリンク"
+              "title": "TA勉強会へのバックリンク"
             }
           },
           {
@@ -129,12 +129,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0506ファイル.md",
+                "file": "TA勉強会.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "0506ファイルからのアウトゴーイングリンク"
+              "title": "TA勉強会からのアウトゴーイングリンク"
             }
           },
           {
@@ -178,7 +178,7 @@
             }
           }
         ],
-        "currentTab": 2
+        "currentTab": 3
       }
     ],
     "direction": "horizontal",
@@ -198,7 +198,7 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "bc75d0dfffe5adab",
+  "active": "c76b3575bded9510",
   "lastOpenFiles": [
     "KindleHilight/Templates/kindle-book-template.md.md",
     "TA勉強会.md",
