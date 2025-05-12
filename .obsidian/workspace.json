@@ -27,12 +27,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "TA勉強会.md",
+                "file": "安室さんnote.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "TA勉強会"
+              "title": "安室さんnote"
             }
           }
         ],
@@ -110,7 +110,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "TA勉強会.md",
+                "file": "安室さんnote.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -120,7 +120,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "TA勉強会へのバックリンク"
+              "title": "安室さんnoteへのバックリンク"
             }
           },
           {
@@ -129,12 +129,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "TA勉強会.md",
+                "file": "安室さんnote.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "TA勉強会からのアウトゴーイングリンク"
+              "title": "安室さんnoteからのアウトゴーイングリンク"
             }
           },
           {
@@ -158,13 +158,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "TA勉強会.md",
+                "file": "安室さんnote.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "TA勉強会のアウトライン"
+              "title": "安室さんnoteのアウトライン"
             }
           },
           {
@@ -198,11 +198,11 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "bc75d0dfffe5adab",
+  "active": "78327f179e8b8b30",
   "lastOpenFiles": [
+    "TA勉強会.md",
     "安室さんnote.md",
     "KindleHilight/Templates/kindle-book-template.md.md",
-    "TA勉強会.md",
     "WORK",
     "obsidian/2025-05-12.md",
     "obsidian/無題のファイル.canvas",

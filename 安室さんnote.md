@@ -1,4 +1,4 @@
-
+https://note.com/amuro_human/n/nb55ea7c62eaf?rt=email&sub_rt=daily_report_followee_notes
 2025年読書⑤健康習慣
 
 環境変化で一時不調になるもOura Ringのバイタルデータを参考に、新しい心身のリズムを探りながら習慣を見直して、セルフマネジメントの重要度を振り返り
