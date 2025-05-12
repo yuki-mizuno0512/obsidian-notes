@@ -142,13 +142,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0506ファイル.md",
+                "file": "KindleHilight/Templates/kindle-book-template.md.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "0506ファイルのアウトライン"
+              "title": "kindle-book-template.mdのアウトライン"
             }
           },
           {
@@ -162,7 +162,7 @@
             }
           }
         ],
-        "currentTab": 4
+        "currentTab": 3
       }
     ],
     "direction": "horizontal",
@@ -182,7 +182,7 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "b96b35d6dfdc9684",
+  "active": "c76b3575bded9510",
   "lastOpenFiles": [
     "KindleHilight/細谷功-仕事に生かす地頭力　──問題解決ピラミッドと９つのレッスン.md",
     "KindleHilight/細谷功-「Why型思考」が仕事を変える 鋭いアウトプットを出せる人の「頭の使い方」.md",
