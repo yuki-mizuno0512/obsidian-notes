@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "KindleHilight/細谷功-仕事に生かす地頭力　──問題解決ピラミッドと９つのレッスン.md",
+                "file": "KindleHilight/Templates/kindle-book-template.md.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "細谷功-仕事に生かす地頭力　──問題解決ピラミッドと９つのレッスン"
+              "title": "kindle-book-template.md"
             }
           }
         ]
@@ -74,8 +74,7 @@
               "title": "ブックマーク"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
@@ -183,21 +182,21 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "9f8db381a91d4d7a",
+  "active": "b96b35d6dfdc9684",
   "lastOpenFiles": [
+    "KindleHilight/細谷功-仕事に生かす地頭力　──問題解決ピラミッドと９つのレッスン.md",
     "KindleHilight/細谷功-「Why型思考」が仕事を変える 鋭いアウトプットを出せる人の「頭の使い方」.md",
     "KindleHilight/ナオキ-MBAより簡単で英語より大切な決算を読む習慣.md",
     "KindleHilight/アンディ・プディコム(著)／満園真木(訳)-からっぽ！　10分間瞑想が忙しいココロを楽にする.md",
     "KindleHilight/滋比古-こうやって、考える。.md",
-    "KindleHilight/細谷功-仕事に生かす地頭力　──問題解決ピラミッドと９つのレッスン.md",
     "KindleHilight/グロービス経営大学院-グロービスMBAクリティカル・シンキング［改訂3版］.md",
     "KindleHilight/尾石晴-やめる時間術.md",
     "KindleHilight/さつき-バレットジャーナル　人生を変えるノート術.md",
     "KindleHilight/アンデシュ・ハンセン、久山葉子-スマホ脳（新潮新書） 『スマホ脳』シリーズ.md",
-    "Templates/kindle-book-template.md.md",
+    "KindleHilight/Templates/kindle-book-template.md.md",
     "KindleHilight/國分功一郎-目的への抵抗―シリーズ哲学講話―（新潮新書）.md",
     "KindleHilight/井上一鷹-集中力　パフォーマンスを300倍にする働き方.md",
-    "Templates",
+    "KindleHilight/Templates",
     "KindleHilight/ＣＴＩジャパン、重松延寿-マンガでやさしくわかるコーチング.md",
     "KindleHilight/オットー・ラスキー、中土井僚、加藤洋平-「人の器」を測るとはどういうことか　成人発達理論における実践的測定手法.md",
     "KindleHilight/佐久間宣行-ごきげんになる技術　キャリアも人間関係も好転する、ブレないメンタルの整え方.md",
