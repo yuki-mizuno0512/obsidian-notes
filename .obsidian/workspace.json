@@ -96,7 +96,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "readwise",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -117,7 +117,8 @@
               "title": "ブックマーク"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
@@ -226,10 +227,10 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "b96b35d6dfdc9684",
+  "active": "bc75d0dfffe5adab",
   "lastOpenFiles": [
-    "情報整理/安室さんnote.md",
     "Twitter/無題のファイル 1.md",
+    "情報整理/安室さんnote.md",
     "無題のフォルダ",
     "Untitled.md",
     "無題のファイル.md",
