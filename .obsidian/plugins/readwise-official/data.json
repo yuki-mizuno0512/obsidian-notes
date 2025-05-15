@@ -1,11 +1,11 @@
 {
-  "token": "",
+  "token": "UbGQRMXnhtrZvJkNgrkeNdF6cHX0IeuxKbVebS4c7KLHkulhIm",
   "readwiseDir": "Readwise",
   "frequency": "0",
   "triggerOnLoad": true,
   "isSyncing": false,
   "lastSyncFailed": false,
-  "lastSavedStatusID": 0,
+  "lastSavedStatusID": 20221709,
   "currentSyncStatusID": 0,
   "refreshBooks": false,
   "booksToRefresh": [],
