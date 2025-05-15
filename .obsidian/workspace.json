@@ -117,7 +117,8 @@
               "title": "ブックマーク"
             }
           }
-        ]
+        ],
+        "currentTab": 2
       }
     ],
     "direction": "horizontal",
@@ -226,7 +227,7 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "5d02026579cc75a6",
+  "active": "d4c1d622a7702efa",
   "lastOpenFiles": [
     "Untitled.md",
     "WORK/TA_スライド説明.md",
