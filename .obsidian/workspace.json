@@ -41,7 +41,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "TA_スライド説明.md",
+                "file": "WORK/TA_スライド説明.md",
                 "mode": "source",
                 "source": false
               },
@@ -212,12 +212,14 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "618e35e056ab0c9f",
+  "active": "b96b35d6dfdc9684",
   "lastOpenFiles": [
+    "情報整理/安室さんnote.md",
+    "WORK/TA_スライド説明.md",
+    "情報整理",
+    "Private",
     "TA勉強会.md",
-    "安室さんnote.md",
-    "歌.md",
-    "TA_スライド説明.md",
+    "Private/歌.md",
     "無題のファイル.canvas",
     "Pasted image 20250514135646.png",
     "Pasted image 20250514135641.png",
@@ -250,8 +252,6 @@
     "file/01_Inbox/ああああ",
     "file/test2",
     "file/01_Inbox",
-    "file",
-    "Obsidian/test2",
-    "Obsidian/01_Inbox/ああああ"
+    "file"
   ]
 }
