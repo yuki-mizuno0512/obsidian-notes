@@ -3,7 +3,7 @@
   "readwiseDir": "Readwise",
   "frequency": "0",
   "triggerOnLoad": true,
-  "isSyncing": false,
+  "isSyncing": true,
   "lastSyncFailed": false,
   "lastSavedStatusID": 20221881,
   "currentSyncStatusID": 0,
