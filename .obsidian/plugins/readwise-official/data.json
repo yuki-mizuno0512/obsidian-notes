@@ -3,13 +3,20 @@
   "readwiseDir": "Readwise",
   "frequency": "0",
   "triggerOnLoad": true,
-  "isSyncing": true,
+  "isSyncing": false,
   "lastSyncFailed": false,
-  "lastSavedStatusID": 20221881,
+  "lastSavedStatusID": 20233765,
   "currentSyncStatusID": 0,
   "refreshBooks": false,
   "booksToRefresh": [],
   "failedBooks": [],
-  "booksIDsMap": {},
+  "booksIDsMap": {
+    "Readwise/Tweets/Tweets From 阿生🥘東京で中華食べる人.md": "51431124",
+    "Readwise/Tweets/Tweets From 𝖿𝗎𝗎.md": "51446944",
+    "Readwise/Tweets/Tweets From 倉嶋里菜【料理研究家｜管理栄養士】.md": "51446945",
+    "Readwise/Tweets/Tweets From だれウマ『宇宙一ずぼら絶品めし』レシピ本大賞入賞.md": "51446946",
+    "Readwise/Tweets/Tweets From 松濤Vimmer.md": "51446952",
+    "Readwise/Tweets/Tweets From まさお@AI駆動開発.md": "51446954"
+  },
   "reimportShowConfirmation": true
 }
