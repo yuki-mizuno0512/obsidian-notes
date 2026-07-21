@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ハイクラス人材マッチング</title>
+<style>
+  :root{
+    --bg:#0f1220; --panel:#171b2e; --panel2:#1f2440; --line:#2b3157;
+    --text:#e8eaf2; --muted:#9aa0be; --accent:#6c8cff; --accent2:#33d9a6;
+    --warn:#ffb454; --chip:#242a4d; --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(160deg,#0d1020,#12162b 60%,#0d1020);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",Meiryo,sans-serif;
+    line-height:1.6;min-height:100vh}
+  .wrap{max-width:1120px;margin:0 auto;padding:28px 20px 80px}
+  header h1{font-size:26px;margin:0 0 4px;letter-spacing:.02em}
+  header p{color:var(--muted);margin:0 0 4px}
+  .disclaimer{background:rgba(255,180,84,.1);border:1px solid rgba(255,180,84,.35);color:#ffd79a;
+    border-radius:10px;padding:10px 14px;font-size:13px;margin:14px 0 22px}
+  .layout{display:grid;grid-template-columns:390px 1fr;gap:24px}
+  @media(max-width:920px){.layout{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+  .form{padding:20px}
+  .form h2{font-size:15px;margin:0 0 16px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+  .field{margin-bottom:18px}
+  .field > label{display:block;font-size:13px;color:var(--muted);margin-bottom:7px;font-weight:600}
+  select,input[type=text]{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);
+    border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit}
+  select:focus,input:focus{outline:none;border-color:var(--accent)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{background:var(--chip);border:1px solid var(--line);color:var(--text);border-radius:999px;
+    padding:7px 13px;font-size:13px;cursor:pointer;user-select:none;transition:.12s}
+  .chip:hover{border-color:var(--accent)}
+  .chip.on{background:var(--accent);border-color:var(--accent);color:#0b0e1c;font-weight:700}
+  .row{display:flex;gap:12px}
+  .row .field{flex:1}
+  .range-val{font-size:12px;color:var(--accent2);float:right}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .actions{display:flex;gap:10px;margin-top:6px}
+  button.primary{flex:1;background:linear-gradient(90deg,var(--accent),#8aa2ff);color:#0b0e1c;border:0;
+    border-radius:10px;padding:13px;font-size:15px;font-weight:800;cursor:pointer}
+  button.ghost{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:10px;
+    padding:13px 16px;cursor:pointer;font-size:14px}
+  button.primary:hover{filter:brightness(1.08)}
+  /* results */
+  .results{padding:4px}
+  .summary-bar{display:flex;align-items:baseline;gap:12px;padding:16px 20px}
+  .summary-bar b{font-size:20px}
+  .summary-bar span{color:var(--muted);font-size:13px}
+  .cand{border-top:1px solid var(--line);padding:18px 20px;display:grid;
+    grid-template-columns:64px 1fr auto;gap:16px;align-items:start}
+  .avatar{width:64px;height:64px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    font-size:22px;font-weight:800;background:linear-gradient(135deg,#2b3157,#3a4488);color:#cfd6ff}
+  .cand h3{margin:0;font-size:17px}
+  .cand .tt{color:var(--accent2);font-size:14px;font-weight:600}
+  .cand .meta{color:var(--muted);font-size:13px;margin:2px 0 8px}
+  .cand .sum{font-size:13.5px;margin:0 0 10px}
+  .badges{display:flex;flex-wrap:wrap;gap:6px}
+  .badge{font-size:11.5px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+  .badge.hit{background:rgba(51,217,166,.14);border-color:rgba(51,217,166,.5);color:#9ff0d4}
+  .score{text-align:center;min-width:92px}
+  .score .pct{font-size:30px;font-weight:900;line-height:1}
+  .score .lab{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .ring{--v:0;width:72px;height:72px;border-radius:50%;margin:0 auto 6px;
+    background:conic-gradient(var(--accent2) calc(var(--v)*1%),var(--panel2) 0);
+    display:flex;align-items:center;justify-content:center}
+  .ring > div{width:56px;height:56px;border-radius:50%;background:var(--panel);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px}
+  .reasons{grid-column:2 / 4;margin-top:4px;font-size:12.5px;color:var(--muted)}
+  .reasons b{color:var(--text)}
+  .avail{font-size:11px;padding:2px 8px;border-radius:6px;margin-left:8px;vertical-align:middle}
+  .avail.active{background:rgba(51,217,166,.18);color:#9ff0d4}
+  .avail.passive{background:rgba(154,160,190,.15);color:var(--muted)}
+  .empty{padding:50px 20px;text-align:center;color:var(--muted)}
+  .hint{font-size:12px;color:var(--muted);margin-top:5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🎯 ハイクラス人材マッチング</h1>
+    <p>要件を入力すると、条件に合致する候補者を適合度スコア順に提示します。</p>
+  </header>
+  <div class="disclaimer">
+    ⚠️ 本アプリはプロトタイプです。表示される候補者は<b>すべて架空のサンプルデータ</b>であり、実在の人物とは一切関係ありません。
+  </div>
+
+  <div class="layout">
+    <!-- 要件フォーム -->
+    <form class="card form" id="reqForm" autocomplete="off">
+      <h2>要件を入力</h2>
+
+      <div class="field">
+        <label>職種・領域</label>
+        <select id="role">
+          <option value="">指定なし</option>
+          <option value="engineering">エンジニアリング</option>
+          <option value="product">プロダクト</option>
+          <option value="sales">セールス / CS</option>
+          <option value="marketing">マーケティング</option>
+          <option value="finance">ファイナンス</option>
+          <option value="operations">オペレーション / 経営</option>
+          <option value="hr">人事 / 組織</option>
+          <option value="data">データ / AI</option>
+          <option value="legal">法務</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>役職レベル（下限）</label>
+        <select id="seniority">
+          <option value="0">指定なし</option>
+          <option value="manager">マネージャー以上</option>
+          <option value="director">ディレクター / 部長以上</option>
+          <option value="vp">VP以上</option>
+          <option value="cxo">CxO（役員クラス）</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>最低経験年数 <span class="range-val" id="yearsVal">指定なし</span></label>
+          <input type="range" id="years" min="0" max="25" step="1" value="0">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>想定年収の上限 <span class="range-val" id="budgetVal">上限なし</span></label>
+        <input type="range" id="budget" min="800" max="4000" step="100" value="4000">
+        <div class="hint">上限を設定すると、候補者の希望下限が予算内に収まるほど加点されます（右端＝上限なし）。</div>
+      </div>
+
+      <div class="field">
+        <label>業界経験（複数選択可）</label>
+        <div class="chips" id="industries">
+          <span class="chip" data-v="saas">SaaS</span>
+          <span class="chip" data-v="fintech">フィンテック</span>
+          <span class="chip" data-v="ecommerce">EC / D2C</span>
+          <span class="chip" data-v="manufacturing">製造業</span>
+          <span class="chip" data-v="gaming">ゲーム</span>
+          <span class="chip" data-v="consulting">コンサル</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>勤務地</label>
+        <div class="chips" id="locations">
+          <span class="chip" data-v="tokyo">東京</span>
+          <span class="chip" data-v="osaka">大阪</span>
+          <span class="chip" data-v="fukuoka">福岡</span>
+          <span class="chip" data-v="remote">フルリモート</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>語学</label>
+        <div class="chips" id="languages">
+          <span class="chip" data-v="ja">日本語</span>
+          <span class="chip" data-v="en">英語（ビジネス）</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>マネジメント規模</label>
+        <select id="mgmt">
+          <option value="0">指定なし</option>
+          <option value="1">プレイヤー / IC（マネジメント不問）</option>
+          <option value="10">10名以上のマネジメント</option>
+          <option value="30">30名以上のマネジメント</option>
+          <option value="80">80名以上の大規模組織</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>キーワード / スキル（カンマ区切り）</label>
+        <input type="text" id="keywords" placeholder="例: Kubernetes, 組織マネジメント, IPO">
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="primary">候補者を検索</button>
+        <button type="button" class="ghost" id="resetBtn">リセット</button>
+      </div>
+    </form>
+
+    <!-- 結果 -->
+    <div class="card">
+      <div class="summary-bar" id="summary">
+        <b id="count">—</b><span id="countLabel">要件を入力して「候補者を検索」を押してください。</span>
+      </div>
+      <div class="results" id="results"></div>
+    </div>
+  </div>
+</div>
+
+<script src="candidates.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
