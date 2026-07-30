@@ -264,5 +264,158 @@
     document.getElementById("budgetVal").textContent = "上限なし";
     document.querySelectorAll(".chip.on").forEach(function (c) { c.classList.remove("on"); });
     render([], false);
+    document.getElementById("weblinkCard").style.display = "none";
+  });
+
+  // =====================================================================
+  // 実在人材をWebで探す — 公開検索クエリ（X-ray検索）リンクの生成
+  // アプリは個人データを取得・保存・スコアリングしない。あくまで人が確認しに行く入口を作る。
+  // =====================================================================
+  var ROLE_TERMS = {
+    engineering: ['ソフトウェアエンジニア', '"software engineer"', "VPoE", "CTO", "テックリード"],
+    product: ["プロダクトマネージャー", '"product manager"', "PdM", "CPO"],
+    sales: ["営業責任者", '"account executive"', '"head of sales"', "VP of Sales"],
+    marketing: ["マーケティング責任者", '"head of marketing"', "CMO", "グロース"],
+    finance: ['"CFO"', "経理財務責任者", '"VP of Finance"', "IPO"],
+    operations: ['"COO"', "事業責任者", "オペレーション責任者", "経営企画"],
+    hr: ["人事責任者", '"head of people"', "CHRO", "組織開発"],
+    data: ["データサイエンティスト", '"data scientist"', '"machine learning engineer"', "MLエンジニア"],
+    legal: ["法務責任者", '"general counsel"', "コンプライアンス"],
+  };
+  var SENIORITY_TERMS = {
+    manager: ["マネージャー", "manager", "リーダー"],
+    director: ["部長", "director", "本部長"],
+    vp: ["VP", '"vice president"', "執行役員"],
+    cxo: ["CxO", '"chief"', "役員", "代表"],
+  };
+  // GitHubのユーザー検索が有効な職種
+  var GITHUB_ROLES = { engineering: 1, data: 1 };
+  // GitHub location:に使う英語表記
+  var LOC_EN = { tokyo: "Tokyo", osaka: "Osaka", fukuoka: "Fukuoka" };
+
+  function orGroup(arr) { return "(" + arr.join(" OR ") + ")"; }
+
+  function buildBoolean(c) {
+    var groups = [];
+    if (c.role) groups.push(orGroup(ROLE_TERMS[c.role]));
+    if (c.seniority && c.seniority !== "0") groups.push(orGroup(SENIORITY_TERMS[c.seniority]));
+    if (c.industries.length) {
+      groups.push(orGroup(c.industries.map(function (i) { return '"' + IND_LABEL[i] + '"'; })));
+    }
+    c.keywords.forEach(function (k) { groups.push('"' + k + '"'); });
+    var locs = c.locations.filter(function (l) { return l !== "remote"; })
+      .map(function (l) { return LOC_LABEL[l]; });
+    if (locs.length) groups.push(orGroup(locs));
+    return { text: groups.join(" "), locs: locs, hasRole: !!c.role };
+  }
+
+  function g(url) { return "https://www.google.com/search?q=" + encodeURIComponent(url); }
+
+  function buildLinks(c) {
+    var b = buildBoolean(c);
+    if (!b.text) return null;
+    var links = [];
+
+    // 1) LinkedIn X-ray（Google経由）
+    links.push({
+      title: "LinkedIn プロフィール検索（X-ray）",
+      note: "Google経由でLinkedInの公開プロフィールを横断検索します。ハイクラス層の定番。",
+      url: g("site:linkedin.com/in/ " + b.text),
+      icon: "in",
+    });
+
+    // 2) GitHub（エンジニア/データ職のみ）
+    if (c.role && GITHUB_ROLES[c.role]) {
+      var q = c.keywords.slice();
+      // GitHubはキーワード + location: が有効。役職語より技術語が効く。
+      var ghLoc = c.locations.filter(function (l) { return LOC_EN[l]; })
+        .map(function (l) { return "location:" + LOC_EN[l]; });
+      var ghQ = (q.length ? q.join(" ") : (c.role === "data" ? "machine learning" : "engineer")) +
+        (ghLoc.length ? " " + ghLoc.join(" ") : "");
+      links.push({
+        title: "GitHub ユーザー検索",
+        note: "エンジニア/データ職の実在ユーザーを技術スタックと勤務地で検索します。",
+        url: "https://github.com/search?q=" + encodeURIComponent(ghQ) + "&type=users",
+        icon: "gh",
+      });
+    }
+
+    // 3) Wantedly（日本のビジネス層）
+    var wq = [];
+    if (c.role) wq.push(ROLE_TERMS[c.role][0]);
+    c.keywords.forEach(function (k) { wq.push(k); });
+    links.push({
+      title: "Wantedly ユーザー検索",
+      note: "日本のスタートアップ/ビジネス層。プロフィールと職務経歴を検索できます。",
+      url: "https://www.wantedly.com/users/search?q=" + encodeURIComponent(wq.join(" ")),
+      icon: "wt",
+    });
+
+    // 4) X（旧Twitter）X-ray — 技術者/経営者の発信を探す
+    links.push({
+      title: "X（旧Twitter）プロフィール検索（X-ray）",
+      note: "公開発信から専門性や関心領域を確認します。スカウト前の人物理解に。",
+      url: g("site:twitter.com OR site:x.com " + b.text),
+      icon: "x",
+    });
+
+    // 5) note / 登壇資料など一般Web
+    links.push({
+      title: "一般Web検索（note・登壇資料・技術ブログ）",
+      note: "発表資料やブログから実績・専門性の裏付けを探します。",
+      url: g(b.text + " (プロフィール OR 経歴 OR 登壇)"),
+      icon: "web",
+    });
+
+    return { links: links, boolean: b.text };
+  }
+
+  function renderLinks(data) {
+    var card = document.getElementById("weblinkCard");
+    var out = document.getElementById("weblinks");
+    if (!data) {
+      card.style.display = "none";
+      return;
+    }
+    var boolBox =
+      '<div class="boolbox">' +
+        '<div class="boollab">生成された検索式（コピーして各媒体でも利用可）</div>' +
+        '<code id="boolText">' + esc(data.boolean) + "</code>" +
+        '<button type="button" class="copybtn" id="copyBool">コピー</button>' +
+      "</div>";
+    var items = data.links.map(function (l) {
+      return (
+        '<a class="linkrow" href="' + esc(l.url) + '" target="_blank" rel="noopener noreferrer">' +
+          '<span class="linkicon ' + l.icon + '">' + esc(l.icon) + "</span>" +
+          "<span class='linkbody'>" +
+            "<b>" + esc(l.title) + " ↗</b>" +
+            "<span>" + esc(l.note) + "</span>" +
+          "</span>" +
+        "</a>"
+      );
+    }).join("");
+    out.innerHTML = boolBox + items;
+    card.style.display = "";
+    document.getElementById("copyBool").addEventListener("click", function () {
+      var t = data.boolean;
+      if (navigator.clipboard) navigator.clipboard.writeText(t);
+      this.textContent = "コピーしました";
+      var self = this;
+      setTimeout(function () { self.textContent = "コピー"; }, 1500);
+    });
+  }
+
+  document.getElementById("webBtn").addEventListener("click", function () {
+    var c = readCriteria();
+    var data = buildLinks(c);
+    if (!data) {
+      var card = document.getElementById("weblinkCard");
+      var out = document.getElementById("weblinks");
+      out.innerHTML = '<div class="empty">検索リンクを作るには、職種・役職・キーワードなどを1つ以上入力してください。</div>';
+      card.style.display = "";
+      return;
+    }
+    renderLinks(data);
+    document.getElementById("weblinkCard").scrollIntoView({ behavior: "smooth", block: "start" });
   });
 })();

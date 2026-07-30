@@ -75,6 +75,31 @@
   .avail.passive{background:rgba(154,160,190,.15);color:var(--muted)}
   .empty{padding:50px 20px;text-align:center;color:var(--muted)}
   .hint{font-size:12px;color:var(--muted);margin-top:5px}
+  /* web検索リンク */
+  button.webbtn{width:100%;margin-top:10px;padding:12px}
+  .weblink-card{margin-top:24px}
+  .wl-head b{font-size:18px}
+  .wl-note{padding:0 20px 6px;font-size:12.5px;color:var(--warn)}
+  .boolbox{margin:14px 20px 8px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    padding:12px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+  .boollab{flex-basis:100%;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .boolbox code{flex:1;min-width:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;
+    color:var(--accent2);word-break:break-all;line-height:1.5}
+  .copybtn{background:var(--accent);border:0;color:#0b0e1c;font-weight:700;border-radius:8px;
+    padding:7px 14px;cursor:pointer;font-size:12.5px;white-space:nowrap}
+  .linkrow{display:flex;gap:14px;align-items:center;text-decoration:none;color:inherit;
+    border-top:1px solid var(--line);padding:15px 20px;transition:.12s}
+  .linkrow:hover{background:var(--panel2)}
+  .linkicon{width:40px;height:40px;flex:none;border-radius:10px;display:flex;align-items:center;
+    justify-content:center;font-size:12px;font-weight:800;text-transform:uppercase;background:#2b3157;color:#cfd6ff}
+  .linkicon.in{background:#0a66c2;color:#fff}
+  .linkicon.gh{background:#e8eaf2;color:#171b2e}
+  .linkicon.x{background:#000;color:#fff}
+  .linkicon.wt{background:#21bddb;color:#04252c}
+  .linkicon.web{background:#3a4488;color:#cfd6ff}
+  .linkbody{display:flex;flex-direction:column;gap:2px}
+  .linkbody b{font-size:14.5px}
+  .linkbody span{font-size:12.5px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -179,9 +204,10 @@
       </div>
 
       <div class="actions">
-        <button type="submit" class="primary">候補者を検索</button>
+        <button type="submit" class="primary">サンプルDBを検索</button>
         <button type="button" class="ghost" id="resetBtn">リセット</button>
       </div>
+      <button type="button" class="ghost webbtn" id="webBtn">🔗 実在人材をWebで探す（検索リンク生成）</button>
     </form>
 
     <!-- 結果 -->
@@ -191,6 +217,19 @@
       </div>
       <div class="results" id="results"></div>
     </div>
+  </div>
+
+  <!-- 実在人材をWebで探す -->
+  <div class="card weblink-card" id="weblinkCard" style="display:none">
+    <div class="summary-bar wl-head">
+      <b>🔗 実在人材をWebで探す</b>
+      <span>入力した要件から公開検索クエリを生成しました。各リンクは新しいタブで開きます。</span>
+    </div>
+    <div class="wl-note">
+      ⚠️ これらは公開情報を<b>あなた（人）が確認しに行くための入口</b>です。本アプリは個人データを取得・保存・スコアリングしません。
+      スカウト等でご利用の際は、各媒体の利用規約と個人情報の取り扱いにご注意ください。
+    </div>
+    <div class="results" id="weblinks"></div>
   </div>
 </div>
 
