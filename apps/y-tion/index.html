@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 </head>
 <body>
-<title>K-tion Cockpit</title>
+<title>Y-tion Cockpit</title>
 <style>
   :root{
     --ground:#FBF7FB; --panel:#FFFFFF; --panel-2:#F5EEF8; --hair:#ECE3F0;
@@ -224,7 +224,7 @@
 </style>
 
 <div class="topbar">
-  <div class="brand"><span class="mark">K-tion</span><span class="sub">Personal Cockpit</span></div>
+  <div class="brand"><span class="mark">Y-tion</span><span class="sub">Personal Cockpit</span></div>
   <div class="controls">
     <div class="seg" role="group" aria-label="デバイスの状態">
       <button id="btn-fold" aria-pressed="true">折 Cover</button>
@@ -285,23 +285,14 @@
 
   // ---------- mock data (grounded in the user's configured skills) ----------
   var focus=[
-    {t:'投資委員会 資料 最終確認', src:'Work',  cls:'w', c:'var(--sky)', meta:'今日 17:00まで'},
-    {t:'△△社 経営陣MTG フォローTODO 送付', src:'MTG', cls:'m', c:'var(--lav)', meta:'議事録由来'},
-    {t:'家族の夕食を予約', src:'Private', cls:'p', c:'var(--peach)', meta:'今日'}
+    {t:'今日の最重要タスク', src:'Work',  cls:'w', c:'var(--sky)', meta:'今日'},
+    {t:'MTGのフォローTODO', src:'MTG', cls:'m', c:'var(--lav)', meta:'議事録由来'},
+    {t:'私用の最優先タスク', src:'Private', cls:'p', c:'var(--peach)', meta:'今日'}
   ];
-  var work=[
-    {r:'S', t:'投資委員会 資料 最終確認', due:'今日', soon:true, badge:'MTG'},
-    {r:'S', t:'△△社 タームシート レビュー', due:'8/15', soon:true},
-    {r:'A', t:'面談メモを Notion へ整理', due:'8/15', badge:'議事録'},
-    {r:'A', t:'採用: キャピタリスト候補 書類確認', due:'8/18', badge:'HRMOS'},
-    {r:'B', t:'週次レポート ドラフト', due:'8/19'},
-    {r:'C', t:'ナレッジ記事 更新', due:'—'}
-  ];
+  // __SYNC__ Private: Notion「パーソナルタスク」DBの未完了で置換される（プレースホルダ）
   var priv=[
-    {r:'A', t:'家賃・カード 振込', due:'8/25'},
-    {r:'B', t:'歯医者 予約', due:'8/16'},
-    {r:'B', t:'ふるさと納税 手続き', due:'8/31'},
-    {r:'C', t:'図書館へ返却', due:'—'}
+    {r:'A', t:'私用タスク サンプル1', due:'—'},
+    {r:'B', t:'私用タスク サンプル2', due:'—'}
   ];
   var mtg=[
     {tm:'10:00', n:'投資先 月次モニタリング（A社）', m:'Zoom · 60分', now:false},
@@ -430,19 +421,21 @@
 
   var sky='color-mix(in srgb,var(--sky) 22%,transparent)';
   var peach='color-mix(in srgb,var(--peach) 24%,transparent)';
+  var syncTag='<span style="margin-left:auto;font-weight:800;color:var(--lav);text-transform:none;letter-spacing:0;font-size:10px;background:color-mix(in srgb,var(--lav) 16%,transparent);padding:2px 9px;border-radius:999px">🔗 Notion同期</span>';
 
   function render(open){
     if(open){
       grid.innerHTML=
-        '<div class="col">'+ heroCard()+ focusCard()+ katanaCard()+ tasksCard('タスク Work','💼',sky,work)+ tasksCard('タスク Private','🏡',peach,priv) +'</div>'+
+        '<div class="col">'+ heroCard()+ focusCard()+ katanaCard()+ tasksCard('タスク Work'+syncTag,'💼',sky,work)+ tasksCard('タスク Private'+syncTag,'🏡',peach,priv) +'</div>'+
         '<div class="col">'+ mtgCard()+ weekCard()+ habitCard()+ inboxCard() +'</div>';
     } else {
       grid.innerHTML=
-        '<div class="col">'+ heroCard()+ focusCard()+ katanaCard()+ habitCard()+ mtgCard()+ inboxCard() +'</div>';
+        '<div class="col">'+ heroCard()+ focusCard()+ katanaCard()+ tasksCard('タスク Private'+syncTag,'🏡',peach,priv,3)+ habitCard()+ mtgCard()+ inboxCard() +'</div>';
     }
   }
   render(false);
 })();
 </script>
+
 </body>
 </html>
