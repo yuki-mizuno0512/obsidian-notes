@@ -72,12 +72,13 @@
   .ghost:focus-visible{outline:2px solid var(--lav); outline-offset:2px}
 
   .stage{width:100%; display:flex; justify-content:center; perspective:1600px}
-  .device{--w:392px; width:var(--w); flex:0 0 var(--w); background:var(--frame); border-radius:40px; padding:13px;
+  .device{--w:372px; width:var(--w); flex:0 0 var(--w); background:var(--frame); border-radius:40px; padding:13px;
     box-shadow:var(--shadow), inset 0 0 0 1px rgba(255,255,255,.4);
     transition:width .6s cubic-bezier(.65,.02,.2,1), flex-basis .6s cubic-bezier(.65,.02,.2,1); position:relative}
-  .device.open{--w:840px}
+  .device.open{--w:852px}   /* Fold8 内側はほぼ正方形 */
   .device::before{content:""; position:absolute; right:-3px; top:130px; width:3px; height:60px; background:var(--frame-2); border-radius:2px}
-  .screen{position:relative; background:var(--ground); border-radius:29px; overflow:hidden; min-height:672px; display:flex; flex-direction:column}
+  .screen{position:relative; background:var(--ground); border-radius:29px; overflow:hidden; min-height:748px; display:flex; flex-direction:column}
+  .device.open .screen{min-height:792px}
   .device.open .screen::after{content:""; position:absolute; top:0; bottom:0; left:50%; width:28px; transform:translateX(-50%);
     background:linear-gradient(90deg,transparent,var(--crease) 42%,var(--crease) 58%,transparent); pointer-events:none; z-index:5}
   .statusbar{display:flex; align-items:center; justify-content:space-between; padding:12px 22px 4px; font-size:12px; color:var(--ink-soft); font-weight:700}
@@ -221,6 +222,26 @@
     .device{--w:100%;max-width:392px} .device.open{--w:100%} .brand .sub{display:none}
   }
   @media (prefers-reduced-motion: reduce){ .device{transition:none} }
+
+  /* ===== 実機モード：枠を外して画面いっぱい。実際の折り曲げに自動追従 ===== */
+  body.real{padding:0;gap:0;background:var(--ground);min-height:100svh}
+  body.real .topbar{width:100%;max-width:none;padding:10px 16px;position:sticky;top:0;z-index:20;
+    background:color-mix(in srgb,var(--ground) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--hair)}
+  body.real .brand .sub{display:none}
+  body.real .seg{display:none}          /* 実機では手動トグル不要（本体の開閉に追従） */
+  body.real .note{display:none}
+  body.real .stage{perspective:none;flex:1}
+  body.real .device,body.real .device.open{width:100%;max-width:none;flex:1 1 auto;padding:0;
+    border-radius:0;background:transparent;box-shadow:none;transition:none}
+  body.real .device::before{display:none}
+  body.real .screen{border-radius:0;min-height:calc(100svh - 52px)}
+  body.real .statusbar{display:none}    /* 実機のステータスバーがあるので不要 */
+  /* 内側画面を開いた（＝ヒンジをまたぐ2セグメント）ときは自動で2ペイン */
+  @media (horizontal-viewport-segments: 2){
+    body.real .device .grid{grid-template-columns:1fr 1fr;gap:16px}
+    body.real .device .screen::after{content:"";position:absolute;top:0;bottom:0;left:50%;width:26px;
+      transform:translateX(-50%);background:linear-gradient(90deg,transparent,var(--crease) 42%,var(--crease) 58%,transparent);pointer-events:none;z-index:5}
+  }
 </style>
 
 <div class="topbar">
@@ -434,6 +455,25 @@
     }
   }
   render(false);
+
+  // ===== 実機モード：実際のデバイスの折り曲げに自動追従 =====
+  var mqFold=null;
+  try{ mqFold=window.matchMedia('(horizontal-viewport-segments: 2)'); }catch(e){}
+  function isRealDevice(){ return window.matchMedia('(pointer: coarse)').matches; }
+  function detectUnfolded(){
+    if(mqFold && mqFold.matches) return true;                                  // ヒンジをまたぐ＝開いた
+    if(navigator.devicePosture && navigator.devicePosture.type==='continuous') return true;
+    return window.innerWidth >= 600;                                            // フォールバック（内側画面は広い）
+  }
+  function syncToDevice(){
+    if(!isRealDevice()){ document.body.classList.remove('real'); return; }      // PCは手動シミュレーターのまま
+    document.body.classList.add('real');
+    setState(detectUnfolded());
+  }
+  window.addEventListener('resize', syncToDevice);
+  if(mqFold && mqFold.addEventListener) mqFold.addEventListener('change', syncToDevice);
+  if(navigator.devicePosture && navigator.devicePosture.addEventListener) navigator.devicePosture.addEventListener('change', syncToDevice);
+  syncToDevice();
 })();
 </script>
 
