@@ -25,13 +25,21 @@ Y-tion のダッシュボードを Notion の最新状態に同期し、非公�
 - `notion-query-meeting-notes` で直近2週間の会議を取得し、各会議の「### アクションアイテム」から未チェック `- [ ]` を収集。
 - チーム定例（例: `weekly:GCP X`、`Xチーム<>篠原さん` 等）を優先。badge に会議の短縮名。
 
-### 3.（任意）今日のMTG ← 当日の会議 / Google Calendar
-### 4.（任意）今日の型・稼働中の習慣 ← Google Doc「矢田由貴_実践ノート」(`19KzT0kU5tOFHGC-nb9O7y4vhPyaYXhLuP5XEgmr7b58`)
+### 3. 今日のMTG ← Google カレンダー（当日）
+- `list_events` で当日(00:00〜24:00 JST)を取得。`attendees` が1名以上の実会議のみ採用（FOCUS_TIME・0名の個人ブロック/タスクは除外）。
+- 各イベント: `{tm:'HH:MM', n:タイトル, m:'参加n名' or '面接・n名'}`。
+
+### 4. 今週のスケジュール（パツパツ度）← Google カレンダー（当週）
+- 月〜日（JST）の各日について、会議（`attendees`≥1）の件数を数える。全休の日は `off:true`。
+- `week=[{d:'月',n:日付,c:件数,...},…]`、当日に `today:true`。密度: c≥5=パツパツ / 3-4=ちょうど / それ以外=ゆとり。
+
+### 5.（任意）今日の型・稼働中の習慣 ← Google Doc「矢田由貴_実践ノート」(`19KzT0kU5tOFHGC-nb9O7y4vhPyaYXhLuP5XEgmr7b58`)
 
 ## 実行手順
 1. `apps/y-tion/index.html` をテンプレートとして読む。
 2. 上記クエリで最新データを取得。
-3. スクリプト内の `var priv=[…]`（`__SYNC__ Private` マーカー）と `var work=[…]`（`__SYNC__ Work` マーカー）を、取得データで置換。必要なら focus/型/習慣も実データへ。
+3. スクリプト内の各 `__SYNC__` マーカー直後の配列を取得データで置換:
+   `var priv`（Private）/ `var work`（Work）/ `var mtg`（今日のMTG）/ `var week`（今週のスケジュール、`today` も更新）。あわせて先頭ステータスバーの日付「（曜）m/d」を当日に更新。必要なら focus/型/習慣も実データへ。
 4. Artifact ツールに `file_path`（生成HTML）と `url`（上記Artifact URL）を渡して再パブリッシュ。
 5. **GitHub には push しない**（生成物は個人データを含むため）。テンプレート/手順の変更のみ commit 可。
 

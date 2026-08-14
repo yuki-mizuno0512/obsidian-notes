@@ -261,7 +261,7 @@
     <div class="screen">
       <div class="statusbar">
         <span class="tabnum">9:41</span>
-        <span style="font-weight:800;color:var(--ink)">木 8/14</span>
+        <span style="font-weight:800;color:var(--ink)">（曜）m/d</span>
         <span class="dots" aria-hidden="true"><span></span><span></span><span></span><i></i></span>
       </div>
       <div class="canvas">
@@ -316,15 +316,15 @@
     {r:'A', t:'私用タスク サンプル1', due:'—'},
     {r:'B', t:'私用タスク サンプル2', due:'—'}
   ];
+  // __SYNC__ MTG: Googleカレンダーの当日イベント（会議）で置換される（プレースホルダ）
   var mtg=[
-    {tm:'10:00', n:'投資先 月次モニタリング（A社）', m:'Zoom · 60分', now:false},
-    {tm:'13:00', n:'経営会議', m:'本社 会議室', now:true},
-    {tm:'15:30', n:'キャピタリスト候補 面談', m:'オンライン', now:false},
-    {tm:'17:00', n:'1on1（メンバー）', m:'30分', now:false}
+    {tm:'10:00', n:'会議サンプル1', m:'参加n名'},
+    {tm:'14:00', n:'会議サンプル2', m:'オンライン'}
   ];
+  // __SYNC__ Week: Googleカレンダーの当週各日の会議件数で置換される（プレースホルダ）。today に当日を設定
   var week=[
-    {d:'月',n:11,c:2},{d:'火',n:12,c:3},{d:'水',n:13,c:1},
-    {d:'木',n:14,c:4,today:true},{d:'金',n:15,c:5},{d:'土',n:16,c:0},{d:'日',n:17,c:0}
+    {d:'月',n:1,c:0},{d:'火',n:2,c:0},{d:'水',n:3,c:0},{d:'木',n:4,c:0,today:true},
+    {d:'金',n:5,c:0},{d:'土',n:6,c:0},{d:'日',n:7,c:0}
   ];
   var inbox=[
     {k:'mail', ic:'✉️', l:'メール 要対応', s:'Gmail 朝トリアージ', n:4},
@@ -386,19 +386,20 @@
     var rows=mtg.map(function(e){
       return '<div class="ev'+(e.now?' now':'')+'"><span class="tm tabnum">'+e.tm+'</span>'+
         '<div class="bd"><div class="en">'+e.n+'</div>'+
-        '<div class="em"><span>'+e.m+'</span><span class="nlink">🔗 Notion</span></div></div></div>';
+        '<div class="em"><span>'+e.m+'</span></div></div></div>';
     }).join('');
-    return '<div class="card"><h3><span class="tick" style="background:color-mix(in srgb,var(--sky) 22%,transparent)">📅</span>今日のMTG</h3>'+
+    return '<div class="card"><h3><span class="tick" style="background:color-mix(in srgb,var(--sky) 22%,transparent)">📅</span>今日のMTG'+calTag+'</h3>'+
       '<div class="tl">'+rows+'</div></div>';
   }
   function weekCard(){
     function dens(c){ return c>=5?3:(c>=3?2:1); }
     var cols=week.map(function(w){
       var d=dens(w.c);
+      var label = w.off ? '休' : (w.c?w.c:'–');
       return '<div class="wd'+(w.today?' today':'')+' d'+d+'"><small>'+w.d+'</small><b class="tabnum">'+w.n+'</b>'+
-        '<span class="cnt'+(w.c?'':' z')+'">'+(w.c?w.c:'–')+'</span></div>';
+        '<span class="cnt'+(w.c?'':' z')+'">'+label+'</span></div>';
     }).join('');
-    return '<div class="card"><h3><span class="tick" style="background:color-mix(in srgb,var(--mint) 22%,transparent)">🗓️</span>今週のスケジュール<span style="margin-left:auto;font-weight:700;color:var(--crit);text-transform:none;letter-spacing:0">金曜がパツパツ</span></h3>'+
+    return '<div class="card"><h3><span class="tick" style="background:color-mix(in srgb,var(--mint) 22%,transparent)">🗓️</span>今週のスケジュール<span style="margin-left:auto;font-weight:700;color:var(--warn);text-transform:none;letter-spacing:0">水曜がパツパツ</span></h3>'+
       '<div class="week">'+cols+'</div>'+
       '<div class="legend">'+
         '<span><i style="background:var(--panel-2)"></i>ゆとり</span>'+
@@ -444,6 +445,7 @@
   var sky='color-mix(in srgb,var(--sky) 22%,transparent)';
   var peach='color-mix(in srgb,var(--peach) 24%,transparent)';
   var syncTag='<span style="margin-left:auto;font-weight:800;color:var(--lav);text-transform:none;letter-spacing:0;font-size:10px;background:color-mix(in srgb,var(--lav) 16%,transparent);padding:2px 9px;border-radius:999px">🔗 Notion同期</span>';
+  var calTag='<span style="margin-left:auto;font-weight:800;color:var(--sky);text-transform:none;letter-spacing:0;font-size:10px;background:color-mix(in srgb,var(--sky) 18%,transparent);padding:2px 9px;border-radius:999px">📅 カレンダー同期</span>';
 
   function render(open){
     if(open){
