@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>K-tion Cockpit</title>
+<style>
+  :root{
+    --ground:#FAF8F3; --panel:#FFFFFF; --panel-2:#F3EFE6; --hair:#E7E0D2;
+    --ink:#23252B; --ink-soft:#6A6659; --ink-faint:#9A9384;
+    --amber:#C98A17; --amber-soft:#E8B04B; --teal:#2A9E88; --coral:#D4503F;
+    --violet:#6B5BD1;
+    --frame:#2B2D34; --frame-2:#3A3D46; --crease:rgba(0,0,0,.10);
+    --good:#2A9E88; --warn:#C98A17; --crit:#D4503F;
+    --shadow:0 20px 60px -20px rgba(40,35,20,.35);
+    --r:16px;
+    --sans:'Hiragino Kaku Gothic ProN','Hiragino Sans','Noto Sans JP','Yu Gothic',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+    --mono:'SF Mono','JetBrains Mono','Roboto Mono',ui-monospace,Menlo,Consolas,monospace;
+  }
+  :root:not([data-theme="light"]){}
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0F1014; --panel:#181A21; --panel-2:#20232C; --hair:#2C2F39;
+      --ink:#ECE7DC; --ink-soft:#A7A394; --ink-faint:#6E6B60;
+      --amber:#E8B04B; --amber-soft:#F0C775; --teal:#3FBFA8; --coral:#E8695B;
+      --violet:#9385F0;
+      --frame:#05060A; --frame-2:#14161C; --crease:rgba(255,255,255,.06);
+      --shadow:0 24px 70px -20px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0F1014; --panel:#181A21; --panel-2:#20232C; --hair:#2C2F39;
+    --ink:#ECE7DC; --ink-soft:#A7A394; --ink-faint:#6E6B60;
+    --amber:#E8B04B; --amber-soft:#F0C775; --teal:#3FBFA8; --coral:#E8695B;
+    --violet:#9385F0;
+    --frame:#05060A; --frame-2:#14161C; --crease:rgba(255,255,255,.06);
+    --shadow:0 24px 70px -20px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--ground); color:var(--ink); font-family:var(--sans);
+    -webkit-font-smoothing:antialiased; line-height:1.5;
+    min-height:100vh; padding:26px 16px 60px;
+    display:flex; flex-direction:column; align-items:center; gap:22px;
+  }
+  .tabnum{font-variant-numeric:tabular-nums}
+
+  /* ---- Top control bar ---- */
+  .topbar{
+    width:100%; max-width:900px; display:flex; align-items:center;
+    justify-content:space-between; gap:16px; flex-wrap:wrap;
+  }
+  .brand{display:flex; align-items:baseline; gap:10px}
+  .brand .mark{
+    font-weight:800; font-size:24px; letter-spacing:-.03em;
+    background:linear-gradient(120deg,var(--amber),var(--violet));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .brand .sub{font-size:12px; color:var(--ink-faint); letter-spacing:.14em; text-transform:uppercase}
+  .controls{display:flex; align-items:center; gap:10px}
+  .seg{display:inline-flex; background:var(--panel-2); border:1px solid var(--hair); border-radius:999px; padding:3px}
+  .seg button{
+    appearance:none; border:0; background:transparent; cursor:pointer;
+    font-family:inherit; font-size:13px; font-weight:600; color:var(--ink-soft);
+    padding:7px 16px; border-radius:999px; transition:.2s; letter-spacing:.02em;
+  }
+  .seg button[aria-pressed="true"]{background:var(--panel); color:var(--ink); box-shadow:0 1px 2px rgba(0,0,0,.12)}
+  .seg button:focus-visible{outline:2px solid var(--amber); outline-offset:2px}
+  .ghost{
+    appearance:none; cursor:pointer; font-family:inherit; font-size:13px; font-weight:600;
+    color:var(--ink-soft); background:var(--panel-2); border:1px solid var(--hair);
+    padding:8px 14px; border-radius:999px; transition:.2s;
+  }
+  .ghost:hover{color:var(--ink)}
+  .ghost:focus-visible{outline:2px solid var(--amber); outline-offset:2px}
+
+  /* ---- Device ---- */
+  .stage{width:100%; display:flex; justify-content:center; perspective:1600px}
+  .device{
+    --w:392px;
+    width:var(--w); flex:0 0 var(--w);
+    background:var(--frame); border-radius:34px; padding:12px;
+    box-shadow:var(--shadow), inset 0 0 0 1px rgba(255,255,255,.04);
+    transition:width .6s cubic-bezier(.65,.02,.2,1), flex-basis .6s cubic-bezier(.65,.02,.2,1);
+    position:relative;
+  }
+  .device.open{--w:840px}
+  .device::before{ /* side buttons */
+    content:""; position:absolute; right:-3px; top:120px; width:3px; height:64px;
+    background:var(--frame-2); border-radius:2px;
+  }
+  .screen{
+    position:relative; background:var(--ground); border-radius:24px; overflow:hidden;
+    min-height:660px; display:flex; flex-direction:column;
+  }
+  /* hinge crease, only visible when open */
+  .device.open .screen::after{
+    content:""; position:absolute; top:0; bottom:0; left:50%; width:26px; transform:translateX(-50%);
+    background:linear-gradient(90deg,transparent,var(--crease) 40%,var(--crease) 60%,transparent);
+    pointer-events:none; z-index:5;
+  }
+  .statusbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:11px 20px 4px; font-size:12px; color:var(--ink-soft); font-weight:600;
+  }
+  .statusbar .dots{display:flex; gap:5px; align-items:center}
+  .statusbar .dots span{width:6px;height:6px;border-radius:50%;background:var(--ink-faint);opacity:.5}
+  .statusbar .dots i{width:16px;height:9px;border:1.5px solid var(--ink-faint);border-radius:2px;display:inline-block;position:relative}
+  .statusbar .dots i::after{content:"";position:absolute;inset:1.5px;width:64%;background:var(--teal);border-radius:1px}
+
+  .canvas{padding:8px 16px 20px; overflow-y:auto; flex:1}
+  /* the reflowing grid */
+  .grid{display:grid; grid-template-columns:1fr; gap:14px}
+  .device.open .grid{grid-template-columns:1fr 1fr; gap:16px; align-items:start; padding:0 6px}
+  .col{display:grid; gap:14px; min-width:0}
+
+  /* ---- Cards ---- */
+  .card{
+    background:var(--panel); border:1px solid var(--hair); border-radius:var(--r);
+    padding:16px; min-width:0;
+  }
+  .card h3{
+    margin:0 0 12px; font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--ink-faint); font-weight:700; display:flex; align-items:center; gap:8px;
+  }
+  .card h3 .tick{width:14px;height:2px;border-radius:2px;background:var(--amber)}
+
+  /* Hero finance */
+  .hero{
+    background:
+      radial-gradient(120% 120% at 100% 0%, color-mix(in srgb,var(--amber) 20%, transparent), transparent 55%),
+      var(--panel);
+    position:relative; overflow:hidden;
+  }
+  .hero .lab{font-size:12px;color:var(--ink-soft);font-weight:600}
+  .hero .big{font-size:40px;font-weight:800;letter-spacing:-.03em;line-height:1;margin:6px 0 2px}
+  .hero .big .yen{font-size:22px;font-weight:700;color:var(--ink-soft);margin-right:2px}
+  .hero .row{display:flex;gap:18px;margin-top:14px;flex-wrap:wrap}
+  .hero .kv{display:flex;flex-direction:column;gap:2px}
+  .hero .kv b{font-size:17px;font-weight:700}
+  .hero .kv small{font-size:11px;color:var(--ink-faint)}
+  .pos{color:var(--teal)} .neg{color:var(--coral)}
+
+  /* finance bars */
+  .bars{display:flex;align-items:flex-end;gap:8px;height:76px;margin-top:4px}
+  .bars .b{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;justify-content:flex-end;height:100%}
+  .bars .b .fill{width:100%;border-radius:6px 6px 3px 3px;background:linear-gradient(180deg,var(--amber-soft),var(--amber));min-height:4px}
+  .bars .b .fill.io{background:linear-gradient(180deg,var(--teal),color-mix(in srgb,var(--teal) 60%,black))}
+  .bars .b small{font-size:10px;color:var(--ink-faint)}
+
+  /* task list */
+  .task{display:flex;align-items:center;gap:11px;padding:9px 0;border-top:1px solid var(--hair)}
+  .task:first-of-type{border-top:0}
+  .rank{
+    flex:0 0 24px;width:24px;height:24px;border-radius:7px;display:grid;place-items:center;
+    font-size:12px;font-weight:800;color:#fff;
+  }
+  .rk-S{background:linear-gradient(135deg,var(--coral),#b23)}
+  .rk-A{background:linear-gradient(135deg,var(--amber),#a66a08)}
+  .rk-B{background:linear-gradient(135deg,var(--violet),#4b3da0)}
+  .rk-C{background:var(--ink-faint)}
+  .task .tt{flex:1;min-width:0;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .task .due{font-size:11px;color:var(--ink-faint);font-weight:600;white-space:nowrap}
+  .task .due.soon{color:var(--coral)}
+  .task .box{width:16px;height:16px;border-radius:5px;border:2px solid var(--hair)}
+  .task.done .tt{color:var(--ink-faint);text-decoration:line-through}
+  .task.done .box{background:var(--teal);border-color:var(--teal);position:relative}
+  .task.done .box::after{content:"✓";position:absolute;inset:0;color:#fff;font-size:10px;display:grid;place-items:center}
+
+  /* works pipeline */
+  .work{padding:11px 0;border-top:1px solid var(--hair)}
+  .work:first-of-type{border-top:0}
+  .work .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .work .name{font-size:14px;font-weight:700}
+  .work .fee{font-size:14px;font-weight:800;letter-spacing:-.02em}
+  .work .meta{display:flex;align-items:center;gap:8px;margin-top:5px;font-size:11px;color:var(--ink-faint)}
+  .chip{font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;letter-spacing:.02em}
+  .st-go{background:color-mix(in srgb,var(--teal) 18%,transparent);color:var(--teal)}
+  .st-wait{background:color-mix(in srgb,var(--amber) 20%,transparent);color:var(--amber)}
+  .st-est{background:color-mix(in srgb,var(--violet) 18%,transparent);color:var(--violet)}
+  .total{display:flex;justify-content:space-between;align-items:baseline;margin-top:12px;padding-top:12px;border-top:2px solid var(--hair)}
+  .total .l{font-size:12px;color:var(--ink-soft);font-weight:600}
+  .total .v{font-size:24px;font-weight:800;letter-spacing:-.03em;color:var(--amber)}
+
+  /* gantt */
+  .gantt{display:grid;gap:9px}
+  .grow{display:grid;grid-template-columns:82px 1fr;gap:10px;align-items:center}
+  .grow .gl{font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .track{position:relative;height:22px;background:var(--panel-2);border-radius:7px;overflow:hidden}
+  .barc{position:absolute;top:3px;bottom:3px;border-radius:5px;background:color-mix(in srgb,var(--violet) 30%,var(--panel));overflow:hidden}
+  .barc .p{position:absolute;inset:0;width:var(--p);background:linear-gradient(90deg,var(--violet),color-mix(in srgb,var(--violet) 70%,var(--teal)))}
+  .barc .pl{position:absolute;right:5px;top:50%;transform:translateY(-50%);font-size:9px;font-weight:800;color:var(--ink);mix-blend-mode:normal}
+  .scale{display:grid;grid-template-columns:82px 1fr;gap:10px;margin-top:2px}
+  .scale .sc{display:flex;justify-content:space-between;font-size:9px;color:var(--ink-faint);font-weight:600}
+  .today{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--coral);z-index:2}
+  .today::after{content:"今日";position:absolute;top:-13px;left:50%;transform:translateX(-50%);font-size:8px;color:var(--coral);font-weight:800;white-space:nowrap}
+
+  /* canvas thumbs */
+  .thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+  .thumb{aspect-ratio:3/4;border-radius:10px;border:1px solid var(--hair);background:var(--panel-2);position:relative;overflow:hidden}
+  .thumb svg{position:absolute;inset:0;width:100%;height:100%}
+  .thumb small{position:absolute;left:6px;bottom:5px;font-size:9px;color:var(--ink-soft);font-weight:600}
+  .thumb.add{display:grid;place-items:center;color:var(--ink-faint);font-size:22px;border-style:dashed}
+
+  /* dock nav */
+  .dock{display:flex;justify-content:space-around;padding:10px 8px 4px;margin-top:2px}
+  .dock button{appearance:none;border:0;background:transparent;cursor:pointer;font-family:inherit;
+    display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink-faint);font-size:9px;font-weight:600;padding:4px}
+  .dock button .ic{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:13px}
+  .dock button[aria-current="true"]{color:var(--amber)}
+  .dock button[aria-current="true"] .ic{background:color-mix(in srgb,var(--amber) 18%,transparent)}
+  .dock button:focus-visible{outline:2px solid var(--amber);outline-offset:2px;border-radius:8px}
+
+  .note{max-width:840px;font-size:12.5px;color:var(--ink-faint);text-align:center;line-height:1.7}
+  .note b{color:var(--ink-soft)}
+
+  .full{grid-column:1/-1}
+  @media (max-width:520px){
+    .device{--w:100%;max-width:392px}
+    .device.open{--w:100%}
+    .brand .sub{display:none}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .device{transition:none}
+  }
+</style>
+
+<div class="topbar">
+  <div class="brand">
+    <span class="mark">K-tion</span>
+    <span class="sub">Personal Cockpit</span>
+  </div>
+  <div class="controls">
+    <div class="seg" role="group" aria-label="デバイスの状態">
+      <button id="btn-fold" aria-pressed="true">折 Cover</button>
+      <button id="btn-open" aria-pressed="false">開 Unfold</button>
+    </div>
+    <button class="ghost" id="btn-theme" title="テーマ切替">◐ Theme</button>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="device" id="device">
+    <div class="screen">
+      <div class="statusbar">
+        <span class="tabnum">9:41</span>
+        <span style="font-weight:700;color:var(--ink)">木 8/14</span>
+        <span class="dots" aria-hidden="true"><span></span><span></span><span></span><i></i></span>
+      </div>
+      <div class="canvas">
+        <div class="grid" id="grid"><!-- rendered by JS --></div>
+        <nav class="dock" aria-label="メインナビ">
+          <button aria-current="true"><span class="ic">🏠</span>ホーム</button>
+          <button><span class="ic">✅</span>タスク</button>
+          <button><span class="ic">💼</span>案件</button>
+          <button><span class="ic">📅</span>予定</button>
+          <button><span class="ic">🎨</span>ボード</button>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="note">
+  <b>使い方</b> — 上の <b>「折 / 開」</b>で Galaxy Z Fold8 の開閉を切り替えると、5つのNotion DB（タスク・案件・入金・予定・フリーボード）が
+  <b>グランス画面 → 2ペインの司令室</b>へ実際にリフローします。データは現在モックです。
+</p>
+
+<script>
+(function(){
+  "use strict";
+  var device = document.getElementById('device');
+  var grid = document.getElementById('grid');
+  var bF = document.getElementById('btn-fold');
+  var bO = document.getElementById('btn-open');
+
+  function setState(open){
+    device.classList.toggle('open', open);
+    bO.setAttribute('aria-pressed', open?'true':'false');
+    bF.setAttribute('aria-pressed', open?'false':'true');
+    render(open);
+  }
+  bF.addEventListener('click', function(){ setState(false); });
+  bO.addEventListener('click', function(){ setState(true); });
+
+  // theme toggle
+  var root = document.documentElement;
+  document.getElementById('btn-theme').addEventListener('click', function(){
+    var cur = root.getAttribute('data-theme');
+    var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var isDark = cur ? cur==='dark' : dark;
+    root.setAttribute('data-theme', isDark?'light':'dark');
+  });
+
+  // ---------- mock data ----------
+  var tasks = [
+    {r:'S', t:'請求書送付（A社 LP制作）', due:'8/15', soon:true},
+    {r:'S', t:'業務委託 契約書レビュー', due:'8/16', soon:true},
+    {r:'A', t:'LP ワイヤーフレーム提出', due:'8/18'},
+    {r:'A', t:'家賃 振込', due:'8/25'},
+    {r:'B', t:'ポートフォリオ更新', due:'—'},
+    {r:'C', t:'名刺デザイン刷新', due:'—'}
+  ];
+  var works = [
+    {n:'LP制作', c:'A社', fee:180000, st:'go',  lab:'進行中', due:'8/22'},
+    {n:'コーポサイト改修', c:'D社', fee:240000, st:'est', lab:'見積中', due:'9/10'},
+    {n:'ロゴデザイン', c:'B社', fee:90000, st:'wait', lab:'確認待ち', due:'8/18'},
+    {n:'記事執筆 5本', c:'C社', fee:86000, st:'go', lab:'進行中', due:'8/29'}
+  ];
+  var monthTotal = works.filter(function(w){return w.st!=='est';}).reduce(function(a,w){return a+w.fee;},0);
+  var fin = { cash:482300, incoming:356000, month:[ {l:'5月',v:38}, {l:'6月',v:52}, {l:'7月',v:44}, {l:'8月',v:63,io:true} ] };
+  // gantt range 8/10 .. 8/31 (21 days), today = 8/14 -> offset (14-10)/21
+  function gpos(s,e){ var a=(s-10)/21*100, b=(e-10)/21*100; return {left:a, w:b-a}; }
+  var gantt = [
+    {l:'LP制作', s:10, e:22, p:70},
+    {l:'ロゴ', s:14, e:18, p:40},
+    {l:'記事執筆', s:12, e:29, p:30},
+    {l:'帰省', s:16, e:17, p:0}
+  ];
+  var todayPct = (14-10)/21*100;
+
+  function yen(n){ return '¥'+n.toLocaleString('ja-JP'); }
+
+  // ---------- card builders ----------
+  function heroCard(){
+    return '<div class="card hero">'+
+      '<div class="lab">手元資金</div>'+
+      '<div class="big tabnum"><span class="yen">¥</span>'+ fin.cash.toLocaleString('ja-JP') +'</div>'+
+      '<div class="row">'+
+        '<div class="kv"><b class="pos tabnum">'+ yen(fin.incoming) +'</b><small>今月の入金予定</small></div>'+
+        '<div class="kv"><b class="tabnum">'+ yen(monthTotal) +'</b><small>確定・進行中の報酬</small></div>'+
+      '</div>'+
+    '</div>';
+  }
+  function financeCard(){
+    var bars = fin.month.map(function(m){
+      return '<div class="b"><div class="fill'+(m.io?' io':'')+'" style="height:'+m.v+'%"></div><small>'+m.l+'</small></div>';
+    }).join('');
+    return '<div class="card"><h3><span class="tick"></span>入金・収支トレンド</h3>'+
+      '<div class="bars">'+bars+'</div></div>';
+  }
+  function tasksCard(limit){
+    var list = tasks.slice(0, limit||tasks.length).map(function(t){
+      return '<div class="task">'+
+        '<span class="rank rk-'+t.r+'">'+t.r+'</span>'+
+        '<span class="tt">'+t.t+'</span>'+
+        '<span class="due'+(t.soon?' soon':'')+'">'+t.due+'</span>'+
+        '<span class="box"></span>'+
+      '</div>';
+    }).join('');
+    return '<div class="card"><h3><span class="tick"></span>今日のフォーカス（S/A/B/C）</h3>'+list+'</div>';
+  }
+  function worksCard(){
+    var list = works.map(function(w){
+      return '<div class="work">'+
+        '<div class="top"><span class="name">'+w.n+'</span><span class="fee tabnum">'+yen(w.fee)+'</span></div>'+
+        '<div class="meta"><span class="chip st-'+w.st+'">'+w.lab+'</span><span>'+w.c+'</span><span>· 納期 '+w.due+'</span></div>'+
+      '</div>';
+    }).join('');
+    return '<div class="card"><h3><span class="tick"></span>案件パイプライン</h3>'+list+
+      '<div class="total"><span class="l">今月の報酬合計</span><span class="v tabnum">'+yen(monthTotal)+'</span></div></div>';
+  }
+  function ganttCard(){
+    var rows = gantt.map(function(g){
+      var p = gpos(g.s,g.e);
+      return '<div class="grow"><span class="gl">'+g.l+'</span>'+
+        '<div class="track"><div class="today" style="left:'+todayPct+'%"></div>'+
+          '<div class="barc" style="left:'+p.left+'%;width:'+p.w+'%">'+
+            '<div class="p" style="--p:'+g.p+'%"></div>'+
+            (g.p?'<span class="pl">'+g.p+'%</span>':'')+
+          '</div>'+
+        '</div></div>';
+    }).join('');
+    return '<div class="card"><h3><span class="tick"></span>スケジュール（ガントチャート）</h3>'+
+      '<div class="gantt">'+rows+'</div>'+
+      '<div class="scale"><span></span><div class="sc"><span>8/10</span><span>8/17</span><span>8/24</span><span>8/31</span></div></div></div>';
+  }
+  function canvasCard(){
+    var strokes = [
+      '<path d="M12 40 Q40 8 70 46 T130 30" fill="none" stroke="var(--violet)" stroke-width="3" stroke-linecap="round"/><path d="M20 70 h100" stroke="var(--amber)" stroke-width="3" stroke-linecap="round"/>',
+      '<circle cx="55" cy="45" r="26" fill="none" stroke="var(--teal)" stroke-width="3"/><path d="M30 90 L90 88" stroke="var(--ink-soft)" stroke-width="3" stroke-linecap="round"/>',
+      '<path d="M16 24 L120 24 M16 48 L96 48 M16 72 L120 70" stroke="var(--amber)" stroke-width="3" stroke-linecap="round"/>'
+    ];
+    var names = ['配色ラフ','ロゴ案','構成メモ'];
+    var t = strokes.map(function(s,i){
+      return '<div class="thumb"><svg viewBox="0 0 140 110" aria-hidden="true">'+s+'</svg><small>'+names[i]+'</small></div>';
+    }).join('');
+    return '<div class="card"><h3><span class="tick"></span>フリーボード</h3>'+
+      '<div class="thumbs">'+t+'<div class="thumb add" title="新規">＋</div></div></div>';
+  }
+
+  function render(open){
+    if(open){
+      grid.innerHTML =
+        '<div class="col">'+ heroCard()+ tasksCard()+ financeCard() +'</div>'+
+        '<div class="col">'+ worksCard()+ ganttCard()+ canvasCard() +'</div>';
+    } else {
+      grid.innerHTML =
+        '<div class="col">'+ heroCard()+ tasksCard(4)+ worksCard()+ ganttCard()+ canvasCard()+ financeCard() +'</div>';
+    }
+  }
+  render(false);
+})();
+</script>
+</body>
+</html>
