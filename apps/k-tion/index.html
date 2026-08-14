@@ -172,6 +172,40 @@
   .ic-exp{background:color-mix(in srgb,var(--butter) 30%,transparent)}
   .num-mail{color:var(--sky)} .num-msg{color:var(--lav)} .num-exp{color:var(--warn)}
 
+  /* daily form (型) */
+  .form2{display:grid;gap:14px}
+  .fseg .fh{font-size:11px;font-weight:800;color:var(--ink-soft);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+  .fseg .fh .dot{width:8px;height:8px;border-radius:50%}
+  .step{display:flex;align-items:center;gap:9px;padding:6px 0;font-size:13px;font-weight:600}
+  .step .ck{width:16px;height:16px;border-radius:50%;border:2px solid var(--hair);flex:0 0 16px}
+  .step .tmn{font-size:11px;color:var(--ink-faint);font-weight:800;min-width:36px;font-variant-numeric:tabular-nums}
+  .step.on .ck{background:var(--mint);border-color:var(--mint);position:relative}
+  .step.on .ck::after{content:"✓";position:absolute;inset:0;color:#fff;font-size:9px;display:grid;place-items:center}
+  .step.on .lbl{color:var(--ink-faint)}
+  .step .lbl{flex:1}
+
+  /* habits */
+  .habit{display:flex;align-items:center;gap:11px;padding:9px 0;border-top:1px solid var(--hair)}
+  .habit:first-of-type{border-top:0}
+  .habit .he{font-size:16px;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--panel-2);flex:0 0 30px}
+  .habit .hl{flex:1;min-width:0}
+  .habit .hl b{font-size:13.5px;font-weight:700;display:block}
+  .habit .hl small{font-size:11px;color:var(--ink-faint)}
+  .streak{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;color:var(--mint);white-space:nowrap}
+  .pips{display:flex;gap:3px}
+  .pips i{width:7px;height:7px;border-radius:50%;background:var(--hair)}
+  .pips i.f{background:var(--mint)}
+  .htag{font-size:10px;font-weight:800;color:var(--lav);background:color-mix(in srgb,var(--lav) 16%,transparent);padding:3px 8px;border-radius:999px;white-space:nowrap}
+
+  /* week density */
+  .wd.d2 .cnt{background:color-mix(in srgb,var(--butter) 32%,transparent);color:var(--warn)}
+  .wd.d3{background:color-mix(in srgb,var(--crit) 12%,transparent)}
+  .wd.d3 .cnt{background:color-mix(in srgb,var(--crit) 22%,transparent);color:var(--crit)}
+  .legend{display:flex;gap:12px;margin-top:10px;font-size:10px;color:var(--ink-faint);font-weight:700;flex-wrap:wrap}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .legend i{width:9px;height:9px;border-radius:3px}
+  .valueline{margin:10px 0 0;font-size:11.5px;color:var(--ink-faint);line-height:1.65}
+
   .dock{display:flex;justify-content:space-around;padding:10px 8px 4px;margin-top:4px}
   .dock button{appearance:none;border:0;background:transparent;cursor:pointer;font-family:inherit;
     display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink-faint);font-size:9px;font-weight:700;padding:4px}
@@ -284,6 +318,24 @@
     {k:'msg',  ic:'💬', l:'Messenger 未返信', s:'返信漏れチェック', n:3},
     {k:'exp',  ic:'🧾', l:'経費 要確認', s:'MF 経費精算', n:6}
   ];
+  // ---- from 実践ノート（取扱説明書） ----
+  var katanaAM=[
+    {tm:'', lbl:'朝の支度', on:true},
+    {tm:'', lbl:'朝ごはん', on:true},
+    {tm:'', lbl:'仕事を始める', on:false}
+  ];
+  var katanaPM=[
+    {tm:'19:30', lbl:'夕食おわり', on:false},
+    {tm:'20:30', lbl:'休憩・かたづけ', on:false},
+    {tm:'21:00', lbl:'リラックス', on:false},
+    {tm:'21:30', lbl:'就寝', on:false}
+  ];
+  var habits=[
+    {e:'🥊', n:'運動（有酸素）', s:'週2回', done:1, of:2, streak:7},
+    {e:'💪', n:'運動（筋トレ）', s:'週1回', done:1, of:1, streak:12},
+    {e:'🗓️', n:'週次プランニング', s:'毎週 金曜', tag:'次は金'},
+    {e:'🌙', n:'就寝前リマインダー', s:'夜のリマインダー', tag:'ON'}
+  ];
 
   function heroCard(){
     var totalMtg=4, totalTodo=inbox.reduce(function(a,i){return a+i.n;},0);
@@ -294,7 +346,8 @@
         '<span class="sumpill"><span class="d" style="background:var(--sky)"></span>MTG <b class="tabnum">'+totalMtg+'</b>件</span>'+
         '<span class="sumpill"><span class="d" style="background:var(--peach)"></span>フォーカス <b class="tabnum">3</b>件</span>'+
         '<span class="sumpill"><span class="d" style="background:var(--butter)"></span>要対応 <b class="tabnum">'+totalTodo+'</b></span>'+
-      '</div></div>';
+      '</div>'+
+      '<div class="valueline">できることを、ひとつずつ 🌿</div></div>';
   }
   function focusCard(){
     var rows=focus.map(function(f){
@@ -326,12 +379,44 @@
       '<div class="tl">'+rows+'</div></div>';
   }
   function weekCard(){
+    function dens(c){ return c>=5?3:(c>=3?2:1); }
     var cols=week.map(function(w){
-      return '<div class="wd'+(w.today?' today':'')+'"><small>'+w.d+'</small><b class="tabnum">'+w.n+'</b>'+
+      var d=dens(w.c);
+      return '<div class="wd'+(w.today?' today':'')+' d'+d+'"><small>'+w.d+'</small><b class="tabnum">'+w.n+'</b>'+
         '<span class="cnt'+(w.c?'':' z')+'">'+(w.c?w.c:'–')+'</span></div>';
     }).join('');
-    return '<div class="card"><h3><span class="tick" style="background:color-mix(in srgb,var(--mint) 22%,transparent)">🗓️</span>今週のスケジュール</h3>'+
-      '<div class="week">'+cols+'</div></div>';
+    return '<div class="card"><h3><span class="tick" style="background:color-mix(in srgb,var(--mint) 22%,transparent)">🗓️</span>今週のスケジュール<span style="margin-left:auto;font-weight:700;color:var(--crit);text-transform:none;letter-spacing:0">金曜がパツパツ</span></h3>'+
+      '<div class="week">'+cols+'</div>'+
+      '<div class="legend">'+
+        '<span><i style="background:var(--panel-2)"></i>ゆとり</span>'+
+        '<span><i style="background:color-mix(in srgb,var(--butter) 42%,transparent)"></i>ちょうど</span>'+
+        '<span><i style="background:color-mix(in srgb,var(--crit) 32%,transparent)"></i>パツパツ</span>'+
+      '</div></div>';
+  }
+  function katanaCard(){
+    function seg(title,color,arr){
+      var steps=arr.map(function(s){
+        return '<div class="step'+(s.on?' on':'')+'"><span class="ck"></span>'+
+          '<span class="tmn">'+(s.tm||'')+'</span>'+
+          '<span class="lbl">'+s.lbl+'</span></div>';
+      }).join('');
+      return '<div class="fseg"><div class="fh"><span class="dot" style="background:'+color+'"></span>'+title+'</div>'+steps+'</div>';
+    }
+    return '<div class="card"><h3><span class="tick" style="background:color-mix(in srgb,var(--peach) 24%,transparent)">🌿</span>今日の型</h3>'+
+      '<div class="form2">'+ seg('朝のルーティン','var(--butter)',katanaAM)+ seg('夜のルーティン','var(--lav)',katanaPM) +'</div></div>';
+  }
+  function habitCard(){
+    var rows=habits.map(function(h){
+      var right;
+      if(h.of){
+        var pips='';for(var i=0;i<h.of;i++){pips+='<i class="'+(i<h.done?'f':'')+'"></i>';}
+        right='<span class="streak"><span class="pips">'+pips+'</span>🔥'+h.streak+'週</span>';
+      } else { right='<span class="htag">'+h.tag+'</span>'; }
+      return '<div class="habit"><span class="he">'+h.e+'</span>'+
+        '<span class="hl"><b>'+h.n+'</b><small>'+h.s+'</small></span>'+right+'</div>';
+    }).join('');
+    return '<div class="card"><h3><span class="tick" style="background:color-mix(in srgb,var(--mint) 22%,transparent)">🔥</span>稼働中の習慣</h3>'+rows+
+      '<p class="valueline">つづけられた日は、それだけで花丸。</p></div>';
   }
   function inboxCard(){
     var rows=inbox.map(function(i){
@@ -349,11 +434,11 @@
   function render(open){
     if(open){
       grid.innerHTML=
-        '<div class="col">'+ heroCard()+ focusCard()+ tasksCard('タスク Work','💼',sky,work)+ tasksCard('タスク Private','🏡',peach,priv) +'</div>'+
-        '<div class="col">'+ mtgCard()+ weekCard()+ inboxCard() +'</div>';
+        '<div class="col">'+ heroCard()+ focusCard()+ katanaCard()+ tasksCard('タスク Work','💼',sky,work)+ tasksCard('タスク Private','🏡',peach,priv) +'</div>'+
+        '<div class="col">'+ mtgCard()+ weekCard()+ habitCard()+ inboxCard() +'</div>';
     } else {
       grid.innerHTML=
-        '<div class="col">'+ heroCard()+ focusCard()+ mtgCard()+ inboxCard()+ tasksCard('タスク Work','💼',sky,work,3)+ tasksCard('タスク Private','🏡',peach,priv,3) +'</div>';
+        '<div class="col">'+ heroCard()+ focusCard()+ katanaCard()+ habitCard()+ mtgCard()+ inboxCard() +'</div>';
     }
   }
   render(false);
