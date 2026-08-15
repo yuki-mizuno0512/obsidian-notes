@@ -3,11 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
 </head>
 <body>
 <title>Y-tion Cockpit</title>
 <style>
   :root{
+    color-scheme: light dark;   /* ページは明暗どちらも自前で対応 → ブラウザの強制ダークを抑制 */
     --ground:#FBF7FB; --panel:#FFFFFF; --panel-2:#F5EEF8; --hair:#ECE3F0;
     --ink:#4B4658; --ink-soft:#8A8398; --ink-faint:#B7AFC4;
     --lav:#9F8AE0; --lav-soft:#C7B6F2; --peach:#F0A98C; --peach-soft:#F8C9B4;
@@ -44,6 +46,7 @@
 
   /* ホスト非依存の強制テーマ（html/body両方でトークン上書き＝メディアクエリより確実に優先） */
   html.tl, body.tl{
+    color-scheme: light;   /* ブラウザの強制ダークを抑制 */
     --ground:#FAF8F3; --panel:#FFFFFF; --panel-2:#F5EEF8; --hair:#ECE3F0;
     --ink:#4B4658; --ink-soft:#8A8398; --ink-faint:#B7AFC4;
     --lav:#9F8AE0; --lav-soft:#C7B6F2; --peach:#F0A98C; --peach-soft:#F8C9B4;
@@ -54,6 +57,7 @@
     --shadow:0 24px 55px -24px rgba(120,90,170,.45);
   }
   html.td, body.td{
+    color-scheme: dark;
     --ground:#131019; --panel:#221C2C; --panel-2:#2D2640; --hair:#3A3150;
     --ink:#F1EAF7; --ink-soft:#BBB1CE; --ink-faint:#847A98;
     --lav:#C6B7F7; --lav-soft:#9A87DC; --peach:#F9C3A9; --peach-soft:#D0967C;
