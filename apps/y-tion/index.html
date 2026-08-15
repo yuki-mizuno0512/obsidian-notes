@@ -516,20 +516,25 @@
   toastNo.addEventListener('click', hideToast);
 
   function completeNotion(el,pid){
+    if(!(window.claude&&window.claude.use)){ flashToast('⚠ この画面では書き込みできません'); return; }
     el.classList.add('done');                                  // 楽観的に完了表示
-    if(!(window.claude&&window.claude.use)){ el.classList.remove('done'); flashToast('この画面では書き込みできません'); return; }
     window.claude.use('mcp').then(function(mcp){
-      if(!mcp){ var e=new Error('no mcp'); e.code='not_granted'; throw e; }
+      if(!mcp){ var e=new Error('no mcp'); e.code='not_granted'; return Promise.reject(e); }
       return mcp.callTool('Notion','notion-update-page',{page_id:pid, command:'update_properties', properties:{'ステータス':'完了'}})
-        .then(function(){ if(mcp.invalidate) return mcp.invalidate('Notion','notion-query-data-sources'); });
-    }).then(function(){ flashToast('✓ Notionを完了にしました'); })
-    .catch(function(err){
+        .then(function(){                                       // ← 書き込み成功＝成功（一覧更新の失敗は無視）
+          flashToast('✓ Notionを完了にしました');
+          if(mcp.invalidate){ try{ mcp.invalidate('Notion','notion-query-data-sources'); }catch(e){} }
+        });
+    }).catch(function(err){
       el.classList.remove('done');                             // 失敗したら戻す
-      var c=err&&err.code;
-      flashToast(c==='needs_reauth'?'Notion再接続が必要です':
-                 c==='server_not_connected'?'Notion未接続です':
-                 c==='tool_error'?'Notion側で更新できませんでした':
-                 '完了にできませんでした（時間をおいて再試行）');
+      var c=(err&&err.code)||'unknown';
+      var m = c==='needs_reauth'?'Notion再接続が必要':
+              c==='server_not_connected'?'Notion未接続':
+              c==='not_in_manifest'?'書き込み未許可':
+              c==='blocked_by_policy'?'ポリシーで拒否':
+              c==='tool_error'?'Notion更新エラー':
+              c==='not_granted'?'接続が許可されていません':'失敗';
+      flashToast('⚠ '+m+' ['+c+']');
     });
   }
 
