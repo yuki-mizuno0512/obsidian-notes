@@ -311,25 +311,31 @@
     {t:'MTGのフォローTODO', src:'MTG', cls:'m', c:'var(--lav)', meta:'議事録由来'},
     {t:'私用の最優先タスク', src:'Private', cls:'p', c:'var(--peach)', meta:'今日'}
   ];
-  // __SYNC__ Private: Notion「パーソナルタスク」DBの未完了で置換される（プレースホルダ）
+  // __SYNC__ Work: NotionのMTG議事録アクションアイテム（未完了）で置換（プレースホルダ）
+  var work=[
+    {r:'A', t:'業務タスク サンプル1', due:'—', badge:'MTG'},
+    {r:'B', t:'業務タスク サンプル2', due:'—', badge:'MTG'}
+  ];
+  // __SYNC__ Private: Notion「パーソナルタスク」DBの未完了で置換（プレースホルダ）
   var priv=[
     {r:'A', t:'私用タスク サンプル1', due:'—'},
     {r:'B', t:'私用タスク サンプル2', due:'—'}
   ];
-  // __SYNC__ MTG: Googleカレンダーの当日イベント（会議）で置換される（プレースホルダ）
+  // __SYNC__ MTG: Googleカレンダーの当日イベント（会議）で置換（プレースホルダ）
   var mtg=[
     {tm:'10:00', n:'会議サンプル1', m:'参加n名'},
     {tm:'14:00', n:'会議サンプル2', m:'オンライン'}
   ];
-  // __SYNC__ Week: Googleカレンダーの当週各日の会議件数で置換される（プレースホルダ）。today に当日を設定
+  // __SYNC__ Week: Googleカレンダーの当週各日の会議件数で置換（プレースホルダ）。today に当日
   var week=[
     {d:'月',n:1,c:0},{d:'火',n:2,c:0},{d:'水',n:3,c:0},{d:'木',n:4,c:0,today:true},
     {d:'金',n:5,c:0},{d:'土',n:6,c:0},{d:'日',n:7,c:0}
   ];
+  // __SYNC__ Inbox: mail=Gmail未読(要対応相当)件数で置換。msg/exp は朝の巡回スキル更新(未接続なら n:null)
   var inbox=[
-    {k:'mail', ic:'✉️', l:'メール 要対応', s:'Gmail 朝トリアージ', n:4},
-    {k:'msg',  ic:'💬', l:'Messenger 未返信', s:'返信漏れチェック', n:3},
-    {k:'exp',  ic:'🧾', l:'経費 要確認', s:'MF 経費精算', n:6}
+    {k:'mail', ic:'✉️', l:'メール 要対応', s:'Gmail 未読（要対応）', n:0, live:true},
+    {k:'msg',  ic:'💬', l:'Messenger 未返信', s:'朝の巡回で更新', n:null},
+    {k:'exp',  ic:'🧾', l:'経費 要確認', s:'MF・朝の巡回で更新', n:null}
   ];
   // ---- from 実践ノート（取扱説明書） ----
   var katanaAM=[
@@ -351,7 +357,7 @@
   ];
 
   function heroCard(){
-    var totalMtg=4, totalTodo=inbox.reduce(function(a,i){return a+i.n;},0);
+    var totalMtg=mtg.length, totalTodo=inbox.reduce(function(a,i){return a+(i.n||0);},0);
     return '<div class="card hero">'+
       '<div class="hi">おはようございます、由貴さん ☀️</div>'+
       '<div class="big">今日は 深呼吸して 1つずつ。</div>'+
@@ -434,9 +440,10 @@
   }
   function inboxCard(){
     var rows=inbox.map(function(i){
+      var val = (i.n==null) ? '–' : i.n;
       return '<div class="in"><span class="ic ic-'+i.k+'">'+i.ic+'</span>'+
-        '<span class="il"><b>'+i.l+'</b><small>'+i.s+'</small></span>'+
-        '<span class="num'+(i.n?' num-'+i.k:' z')+' tabnum">'+i.n+'</span></div>';
+        '<span class="il"><b>'+i.l+(i.live?' <span style="font-size:9px;font-weight:800;color:var(--sky);vertical-align:middle">●LIVE</span>':'')+'</b><small>'+i.s+'</small></span>'+
+        '<span class="num'+((i.n!=null)?' num-'+i.k:' z')+' tabnum">'+val+'</span></div>';
     }).join('');
     return '<div class="card"><h3><span class="tick" style="background:color-mix(in srgb,var(--butter) 28%,transparent)">📥</span>要対応インボックス</h3>'+
       '<div class="inbox">'+rows+'</div></div>';
