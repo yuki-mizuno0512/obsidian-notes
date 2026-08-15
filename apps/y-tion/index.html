@@ -42,8 +42,8 @@
     --shadow:0 28px 65px -22px rgba(0,0,0,.7);
   }
 
-  /* ホスト非依存の強制テーマ（body直下でトークン上書き＝メディアクエリより確実に優先） */
-  body.tl{
+  /* ホスト非依存の強制テーマ（html/body両方でトークン上書き＝メディアクエリより確実に優先） */
+  html.tl, body.tl{
     --ground:#FAF8F3; --panel:#FFFFFF; --panel-2:#F5EEF8; --hair:#ECE3F0;
     --ink:#4B4658; --ink-soft:#8A8398; --ink-faint:#B7AFC4;
     --lav:#9F8AE0; --lav-soft:#C7B6F2; --peach:#F0A98C; --peach-soft:#F8C9B4;
@@ -53,7 +53,7 @@
     --good:#6FC7A8; --warn:#E0A94E; --crit:#D4503F;
     --shadow:0 24px 55px -24px rgba(120,90,170,.45);
   }
-  body.td{
+  html.td, body.td{
     --ground:#131019; --panel:#221C2C; --panel-2:#2D2640; --hair:#3A3150;
     --ink:#F1EAF7; --ink-soft:#BBB1CE; --ink-faint:#847A98;
     --lav:#C6B7F7; --lav-soft:#9A87DC; --peach:#F9C3A9; --peach-soft:#D0967C;
@@ -386,9 +386,8 @@
   var THEMES=['auto','light','dark'];
   var themeBtn=document.getElementById('btn-theme');
   function applyTheme(t){
-    document.body.classList.remove('tl','td');
-    if(t==='light') document.body.classList.add('tl');
-    else if(t==='dark') document.body.classList.add('td');
+    var els=[document.documentElement, document.body];
+    els.forEach(function(el){ if(el){ el.classList.remove('tl','td'); if(t==='light') el.classList.add('tl'); else if(t==='dark') el.classList.add('td'); } });
     if(themeBtn) themeBtn.textContent = (t==='light'?'☀️ Light':t==='dark'?'🌙 Dark':'◐ Auto');
     try{ localStorage.setItem('ytion_theme', t); }catch(e){}
   }
