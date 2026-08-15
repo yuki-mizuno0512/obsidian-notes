@@ -219,7 +219,9 @@
   @keyframes flash{0%{box-shadow:0 0 0 2px var(--lav)}100%{box-shadow:0 6px 20px -14px rgba(120,90,170,.35)}}
   @media (prefers-reduced-motion: reduce){ .card.flash{animation:none} }
 
-  .dock{display:flex;justify-content:space-around;padding:10px 8px 4px;margin-top:4px}
+  .dock{display:flex;justify-content:space-around;flex-shrink:0;
+    padding:8px 8px calc(6px + env(safe-area-inset-bottom,0px));
+    background:var(--ground);border-top:1px solid var(--hair);z-index:10}
   .dock button{appearance:none;border:0;background:transparent;cursor:pointer;font-family:inherit;
     display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink-faint);font-size:9px;font-weight:700;padding:4px}
   .dock button .ic{width:24px;height:24px;border-radius:9px;display:grid;place-items:center;font-size:14px}
@@ -277,14 +279,14 @@
       </div>
       <div class="canvas">
         <div class="grid" id="grid"></div>
-        <nav class="dock" aria-label="メインナビ">
-          <button data-target="home" aria-current="true"><span class="ic">🏠</span>ホーム</button>
-          <button data-target="work"><span class="ic">💼</span>Work</button>
-          <button data-target="private"><span class="ic">🏡</span>Private</button>
-          <button data-target="sched"><span class="ic">📅</span>予定</button>
-          <button data-target="inbox"><span class="ic">📥</span>受信</button>
-        </nav>
       </div>
+      <nav class="dock" aria-label="メインナビ">
+        <button data-target="home" aria-current="true"><span class="ic">🏠</span>ホーム</button>
+        <button data-target="work"><span class="ic">💼</span>Work</button>
+        <button data-target="private"><span class="ic">🏡</span>Private</button>
+        <button data-target="sched"><span class="ic">📅</span>予定</button>
+        <button data-target="inbox"><span class="ic">📥</span>受信</button>
+      </nav>
     </div>
   </div>
 </div>
@@ -333,7 +335,7 @@
     {r:'A', t:'業務タスク サンプル1', due:'—', badge:'MTG'},
     {r:'B', t:'業務タスク サンプル2', due:'—', badge:'MTG'}
   ];
-  // __SYNC__ Private: Notion「パーソナルタスク」DBの未完了で置換（プレースホルダ）
+  // __SYNC__ Private: 表示時にNotionからライブ取得＋毎朝Routineで置換（プレースホルダ）
   var priv=[
     {r:'A', t:'私用タスク サンプル1', due:'—'},
     {r:'B', t:'私用タスク サンプル2', due:'—'}
