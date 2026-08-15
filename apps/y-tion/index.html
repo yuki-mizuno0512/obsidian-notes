@@ -225,6 +225,27 @@
   .addbtn{margin-top:11px;width:100%;appearance:none;border:1px dashed var(--hair);background:var(--panel-2);
     color:var(--ink-soft);font-family:inherit;font-weight:800;font-size:12px;padding:9px;border-radius:12px;cursor:pointer}
   .addbtn:active{opacity:.6}
+  .addform{position:absolute;left:12px;right:12px;bottom:calc(66px + env(safe-area-inset-bottom,0px));
+    background:var(--panel);border:1px solid var(--hair);border-radius:16px;box-shadow:var(--shadow);
+    padding:14px;display:none;flex-direction:column;gap:10px;z-index:31}
+  .addform.show{display:flex}
+  .addform .afhead{font-size:12px;font-weight:800;color:var(--ink-soft)}
+  .addform .af-t,.addform .af-d{border:1px solid var(--hair);border-radius:10px;padding:9px 11px;font-family:inherit;font-size:14px;background:var(--panel-2);color:var(--ink)}
+  .addform .af-t:focus,.addform .af-d:focus{outline:2px solid var(--lav);outline-offset:1px}
+  .addform .af-row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+  .addform .af-d{flex:1;min-width:130px}
+  .addform .af-pri{display:flex;gap:5px}
+  .addform .af-pri button{width:34px;height:34px;border-radius:9px;border:1px solid var(--hair);background:var(--panel-2);
+    color:var(--ink-soft);font-family:inherit;font-weight:800;font-size:13px;cursor:pointer}
+  .addform .af-pri button.sel{color:#fff;border-color:transparent}
+  .addform .af-pri button[data-p="S"].sel{background:var(--crit)}
+  .addform .af-pri button[data-p="A"].sel{background:var(--peach)}
+  .addform .af-pri button[data-p="B"].sel{background:var(--lav)}
+  .addform .af-pri button[data-p="C"].sel{background:var(--ink-faint)}
+  .addform .af-btns{display:flex;gap:9px;justify-content:flex-end}
+  .addform .af-btns button{appearance:none;border:0;border-radius:999px;font-family:inherit;font-weight:800;font-size:13px;padding:9px 18px;cursor:pointer}
+  .addform .af-cancel{background:var(--panel-2);color:var(--ink-soft)}
+  .addform .af-add{background:var(--mint);color:#fff}
   .task,.step{cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:8px}
   .task[data-pid]:active{opacity:.55}
   .task .nlink2{flex:0 0 auto;width:24px;height:24px;border-radius:7px;display:grid;place-items:center;
@@ -305,6 +326,17 @@
         <button data-target="inbox"><span class="ic">📥</span>受信</button>
       </nav>
       <div class="toast" id="toast"><span class="msg"></span><input class="tin" type="text" placeholder="新しいPrivateタスク" style="display:none"><button class="no" type="button">やめる</button><button class="yes" type="button">はい</button></div>
+      <div class="addform" id="addform">
+        <div class="afhead">Privateタスクを追加</div>
+        <input class="af-t" type="text" placeholder="やること">
+        <div class="af-row">
+          <input class="af-d" type="date" aria-label="期限">
+          <div class="af-pri" role="group" aria-label="優先度">
+            <button type="button" data-p="S">S</button><button type="button" data-p="A">A</button><button type="button" data-p="B" class="sel">B</button><button type="button" data-p="C">C</button>
+          </div>
+        </div>
+        <div class="af-btns"><button type="button" class="af-cancel">やめる</button><button type="button" class="af-add">追加</button></div>
+      </div>
     </div>
   </div>
 </div>
@@ -538,14 +570,16 @@
   toastNo.addEventListener('click', hideToast);
   tin.addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); toastYes.click(); } });
 
-  function createNotionTask(text){
+  function createNotionTask(text, due, pri){
     if(!(window.claude&&window.claude.use)){ flashToast('⚠ この画面では追加できません'); return; }
     flashToast('追加中…');
+    var props={'やること':text, 'ステータス':'未着手', '種別':'私用', '優先度':(pri||'B')};
+    if(due){ props['date:期限:start']=due; props['date:期限:is_datetime']=0; }
     window.claude.use('mcp').then(function(mcp){
       if(!mcp){ var e=new Error('no'); e.code='not_granted'; return Promise.reject(e); }
       return mcp.callTool('Notion','notion-create-pages',{
         parent:{type:'data_source_id', data_source_id:'af353e4a-dcf7-4e3f-bad1-966adff2d840'},
-        pages:[{properties:{'やること':text, 'ステータス':'未着手', '種別':'私用'}}]
+        pages:[{properties:props}]
       }).then(function(){
         flashToast('✓ 追加しました');
         if(mcp.invalidate){ try{ mcp.invalidate('Notion','notion-query-data-sources'); }catch(e){} }
@@ -555,6 +589,29 @@
       flashToast('⚠ 追加できませんでした ['+c+']');
     });
   }
+
+  // 追加フォーム（やること＋期限＋優先度）
+  var addform=document.getElementById('addform');
+  var afT=addform.querySelector('.af-t'), afD=addform.querySelector('.af-d');
+  var afPriBtns=addform.querySelectorAll('.af-pri button');
+  var afPri='B';
+  Array.prototype.forEach.call(afPriBtns,function(b){ b.addEventListener('click',function(){
+    afPri=b.getAttribute('data-p');
+    Array.prototype.forEach.call(afPriBtns,function(x){ x.classList.toggle('sel', x===b); });
+  });});
+  function openAddForm(){
+    afT.value=''; afD.value=''; afPri='B';
+    Array.prototype.forEach.call(afPriBtns,function(x){ x.classList.toggle('sel', x.getAttribute('data-p')==='B'); });
+    hideToast(); addform.classList.add('show'); setTimeout(function(){ try{afT.focus();}catch(e){} },60);
+  }
+  function closeAddForm(){ addform.classList.remove('show'); }
+  addform.querySelector('.af-cancel').addEventListener('click', closeAddForm);
+  addform.querySelector('.af-add').addEventListener('click', function(){
+    var t=(afT.value||'').trim(); if(!t){ try{afT.focus();}catch(e){} return; }
+    var due=afD.value||''; var pri=afPri;
+    closeAddForm(); createNotionTask(t, due, pri);
+  });
+  afT.addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); addform.querySelector('.af-add').click(); } });
 
   function completeNotion(el,pid){
     if(!(window.claude&&window.claude.use)){ flashToast('⚠ この画面では書き込みできません'); return; }
@@ -582,7 +639,7 @@
   grid.addEventListener('click', function(e){
     if(e.target.closest('a')) return;                          // Notionリンク等はそのまま遷移
     var add=e.target.closest('[data-add]');                    // ＋ タスク追加
-    if(add){ askInput('新しいPrivateタスク', createNotionTask); return; }
+    if(add){ openAddForm(); return; }
     var el=e.target.closest('.task,.step');
     if(!el || !grid.contains(el)) return;
     var pid=el.getAttribute('data-pid');
@@ -655,7 +712,7 @@
 
       // --- Private ← Notion パーソナルタスク（未完了） ---
       var PRIV_DS='collection://af353e4a-dcf7-4e3f-bad1-966adff2d840';
-      var PRIV_SQL='SELECT "やること" AS task, "ステータス" AS st, "date:期限:start" AS due, url AS url FROM "'+PRIV_DS+'" WHERE "ステータス" IS NULL OR "ステータス" != \'完了\' ORDER BY (due IS NULL), date(due) ASC';
+      var PRIV_SQL='SELECT "やること" AS task, "ステータス" AS st, "優先度" AS pri, "date:期限:start" AS due, url AS url FROM "'+PRIV_DS+'" WHERE "ステータス" IS NULL OR "ステータス" != \'完了\' ORDER BY ("優先度" IS NULL), CASE "優先度" WHEN \'S\' THEN 0 WHEN \'A\' THEN 1 WHEN \'B\' THEN 2 WHEN \'C\' THEN 3 ELSE 4 END, (due IS NULL), date(due) ASC';
       try{
         mcp.watchTool('Notion','notion-query-data-sources',{data:{data_source_urls:[PRIV_DS],query:PRIV_SQL}},function(ev){
           if(ev.type!=='data') return;
@@ -663,7 +720,8 @@
           var today=jstDate();
           priv=rows.map(function(r,i){
             var overdue = r.due && r.due<today;
-            return {r: overdue?(i===0?'S':'A'):'B', t:r.task, due: mdFromISO(r.due), soon:!!overdue, badge:(r.st==='着手中'?'着手中':undefined), pid: pidFromUrl(r.url), url:r.url};
+            var rank = r.pri || (overdue?(i===0?'S':'A'):'B');   // 優先度があれば優先。無ければ期限から推定
+            return {r: rank, t:r.task, due: mdFromISO(r.due), soon:!!overdue, badge:(r.st==='着手中'?'着手中':undefined), pid: pidFromUrl(r.url), url:r.url};
           });
           ok.notion=true; mark(); rerender();
         });
