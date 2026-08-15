@@ -77,8 +77,8 @@
     transition:width .6s cubic-bezier(.65,.02,.2,1), flex-basis .6s cubic-bezier(.65,.02,.2,1); position:relative}
   .device.open{--w:892px}   /* Fold8 内側はほぼ正方形 */
   .device::before{content:""; position:absolute; right:-3px; top:130px; width:3px; height:60px; background:var(--frame-2); border-radius:2px}
-  .screen{position:relative; background:var(--ground); border-radius:29px; overflow:hidden; min-height:748px; display:flex; flex-direction:column}
-  .device.open .screen{min-height:792px}
+  .screen{position:relative; background:var(--ground); border-radius:29px; overflow:hidden; height:748px; display:flex; flex-direction:column}
+  .device.open .screen{height:792px}
   .device.open .screen::after{content:""; position:absolute; top:0; bottom:0; left:50%; width:28px; transform:translateX(-50%);
     background:linear-gradient(90deg,transparent,var(--crease) 42%,var(--crease) 58%,transparent); pointer-events:none; z-index:5}
   .statusbar{display:flex; align-items:center; justify-content:space-between; padding:12px 22px 4px; font-size:12px; color:var(--ink-soft); font-weight:700}
@@ -87,7 +87,7 @@
   .statusbar .dots i{width:16px;height:9px;border:1.5px solid var(--ink-faint);border-radius:2px;display:inline-block;position:relative}
   .statusbar .dots i::after{content:"";position:absolute;inset:1.5px;width:64%;background:var(--mint);border-radius:1px}
 
-  .canvas{padding:6px 14px 16px; overflow-y:auto; flex:1}
+  .canvas{padding:6px 14px 16px; overflow-y:auto; flex:1 1 auto; min-height:0}
   .device.open .canvas{padding-left:8px; padding-right:8px}
   .grid{display:grid; grid-template-columns:1fr; gap:13px}
   .device.open .grid{grid-template-columns:1fr 1fr; gap:18px; align-items:start; padding:0}
@@ -247,17 +247,17 @@
   @media (prefers-reduced-motion: reduce){ .device{transition:none} }
 
   /* ===== 実機モード：枠を外して画面いっぱい。実際の折り曲げに自動追従 ===== */
-  body.real{padding:0;gap:0;background:var(--ground);min-height:100svh}
-  body.real .topbar{width:100%;max-width:none;padding:10px 16px;position:sticky;top:0;z-index:20;
-    background:color-mix(in srgb,var(--ground) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--hair)}
+  body.real{padding:0;gap:0;background:var(--ground);height:100svh;overflow:hidden;display:flex;flex-direction:column}
+  body.real .topbar{flex:0 0 auto;width:100%;max-width:none;padding:10px 16px;z-index:20;
+    background:color-mix(in srgb,var(--ground) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--hair)}
   body.real .brand .sub{display:none}
   body.real .seg{display:none}          /* 実機では手動トグル不要（本体の開閉に追従） */
   body.real .note{display:none}
-  body.real .stage{perspective:none;flex:1}
-  body.real .device,body.real .device.open{width:100%;max-width:none;flex:1 1 auto;padding:0;
-    border-radius:0;background:transparent;box-shadow:none;transition:none}
+  body.real .stage{perspective:none;flex:1 1 auto;min-height:0;display:flex}
+  body.real .device,body.real .device.open{width:100%;max-width:none;flex:1 1 auto;min-height:0;padding:0;
+    border-radius:0;background:transparent;box-shadow:none;transition:none;display:flex;flex-direction:column}
   body.real .device::before{display:none}
-  body.real .screen{border-radius:0;min-height:calc(100svh - 52px)}
+  body.real .screen{border-radius:0;flex:1 1 auto;min-height:0;height:auto}
   body.real .statusbar{display:none}    /* 実機のステータスバーがあるので不要 */
   /* 内側画面を開いた（＝ヒンジをまたぐ2セグメント）ときは自動で2ペイン */
   @media (horizontal-viewport-segments: 2){
