@@ -212,7 +212,16 @@
     background:var(--panel-2);border:1px solid var(--hair);color:var(--ink-faint);white-space:nowrap}
   .livechip.live{color:var(--mint);background:color-mix(in srgb,var(--mint) 16%,transparent);border-color:transparent}
   .livechip.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,transparent);border-color:transparent}
+  .toast{position:absolute;left:12px;right:12px;bottom:calc(66px + env(safe-area-inset-bottom,0px));
+    background:var(--panel);border:1px solid var(--hair);border-radius:14px;box-shadow:var(--shadow);
+    padding:11px 13px;display:none;align-items:center;gap:9px;z-index:30}
+  .toast.show{display:flex}
+  .toast .msg{flex:1;min-width:0;font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .toast button{appearance:none;border:0;border-radius:999px;font-family:inherit;font-weight:800;font-size:12px;padding:7px 15px;cursor:pointer;flex:0 0 auto}
+  .toast .yes{background:var(--mint);color:#fff}
+  .toast .no{background:var(--panel-2);color:var(--ink-soft)}
   .task,.step{cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:8px}
+  .task[data-pid]:active{opacity:.55}
   .task:active,.step:active{opacity:.55}
   .card{scroll-margin-top:60px}
   .card.flash{animation:flash 1.1s ease}
@@ -287,6 +296,7 @@
         <button data-target="sched"><span class="ic">📅</span>予定</button>
         <button data-target="inbox"><span class="ic">📥</span>受信</button>
       </nav>
+      <div class="toast" id="toast"><span class="msg"></span><button class="no" type="button">やめる</button><button class="yes" type="button">はい</button></div>
     </div>
   </div>
 </div>
@@ -397,7 +407,7 @@
   function tasksCard(title,icon,tint,arr,limit,sec){
     var list=arr.slice(0,limit||arr.length).map(function(t){
       var k='task:'+t.t, done=isDone(k,false);
-      return '<div class="task'+(done?' done':'')+'" data-k="'+encodeURIComponent(k)+'"><span class="rank rk-'+t.r+'">'+t.r+'</span>'+
+      return '<div class="task'+(done?' done':'')+'" data-k="'+encodeURIComponent(k)+'"'+(t.pid?' data-pid="'+t.pid+'"':'')+'><span class="rank rk-'+t.r+'">'+t.r+'</span>'+
         '<span class="tt">'+t.t+'</span>'+
         (t.badge?'<span class="badge">'+t.badge+'</span>':'')+
         '<span class="due'+(t.soon?' soon':'')+'">'+t.due+'</span>'+
@@ -488,11 +498,52 @@
   }
   render(false);
 
-  // ===== 押せるように：チェック操作＋下部ナビ =====
+  // ===== 押せるように：チェック操作＋下部ナビ＋Notion書き込み =====
+  var toast=document.getElementById('toast');
+  var toastYes=toast.querySelector('.yes'), toastNo=toast.querySelector('.no'), toastMsg=toast.querySelector('.msg');
+  var pendingYes=null, toastTimer=null;
+  function askConfirm(msg,onYes){
+    pendingYes=onYes; toastMsg.textContent=msg;
+    toastYes.style.display=''; toastNo.textContent='やめる';
+    toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(hideToast,9000);
+  }
+  function flashToast(msg){
+    pendingYes=null; toastMsg.textContent=msg; toastYes.style.display='none'; toastNo.textContent='閉じる';
+    toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(hideToast,2600);
+  }
+  function hideToast(){ toast.classList.remove('show'); pendingYes=null; }
+  toastYes.addEventListener('click',function(){ var f=pendingYes; hideToast(); if(f) f(); });
+  toastNo.addEventListener('click', hideToast);
+
+  function completeNotion(el,pid){
+    el.classList.add('done');                                  // 楽観的に完了表示
+    if(!(window.claude&&window.claude.use)){ el.classList.remove('done'); flashToast('この画面では書き込みできません'); return; }
+    window.claude.use('mcp').then(function(mcp){
+      if(!mcp){ var e=new Error('no mcp'); e.code='not_granted'; throw e; }
+      return mcp.callTool('Notion','notion-update-page',{page_id:pid, command:'update_properties', properties:{'ステータス':'完了'}})
+        .then(function(){ if(mcp.invalidate) return mcp.invalidate('Notion','notion-query-data-sources'); });
+    }).then(function(){ flashToast('✓ Notionを完了にしました'); })
+    .catch(function(err){
+      el.classList.remove('done');                             // 失敗したら戻す
+      var c=err&&err.code;
+      flashToast(c==='needs_reauth'?'Notion再接続が必要です':
+                 c==='server_not_connected'?'Notion未接続です':
+                 c==='tool_error'?'Notion側で更新できませんでした':
+                 '完了にできませんでした（時間をおいて再試行）');
+    });
+  }
+
   grid.addEventListener('click', function(e){
     var el=e.target.closest('.task,.step');
     if(!el || !grid.contains(el)) return;
-    var k=el.getAttribute('data-k'); if(!k) return;
+    var pid=el.getAttribute('data-pid');
+    if(el.classList.contains('task') && pid){                  // Privateライブタスク → Notionへ書き込み
+      if(el.classList.contains('done')) return;                // 既に完了表示なら無視
+      var name=(el.querySelector('.tt')&&el.querySelector('.tt').textContent)||'このタスク';
+      askConfirm('「'+name+'」を完了にする？', function(){ completeNotion(el,pid); });
+      return;
+    }
+    var k=el.getAttribute('data-k'); if(!k) return;            // それ以外 → 端末内トグル
     k=decodeURIComponent(k);
     var cls=el.classList.contains('task')?'done':'on';
     el.classList.toggle(cls);
@@ -542,6 +593,7 @@
   function hhmm(iso){ try{return new Date(iso).toLocaleTimeString('ja-JP',{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit',hour12:false});}catch(e){return '';} }
   function pad(n){return (n<10?'0':'')+n;}
   function mdFromISO(s){ if(!s) return '—'; var p=s.slice(0,10).split('-'); return p.length===3?(parseInt(p[1],10)+'/'+parseInt(p[2],10)):'—'; }
+  function pidFromUrl(u){ if(!u) return ''; return String(u).split('?')[0].split('#')[0].replace(/\/$/,'').split('/').pop(); }
 
   function initLive(){
     var C = (typeof window!=='undefined' && window.claude && window.claude.use) ? window.claude : null;
@@ -554,7 +606,7 @@
 
       // --- Private ← Notion パーソナルタスク（未完了） ---
       var PRIV_DS='collection://af353e4a-dcf7-4e3f-bad1-966adff2d840';
-      var PRIV_SQL='SELECT "やること" AS task, "ステータス" AS st, "date:期限:start" AS due FROM "'+PRIV_DS+'" WHERE "ステータス" IS NULL OR "ステータス" != \'完了\' ORDER BY (due IS NULL), date(due) ASC';
+      var PRIV_SQL='SELECT "やること" AS task, "ステータス" AS st, "date:期限:start" AS due, url AS url FROM "'+PRIV_DS+'" WHERE "ステータス" IS NULL OR "ステータス" != \'完了\' ORDER BY (due IS NULL), date(due) ASC';
       try{
         mcp.watchTool('Notion','notion-query-data-sources',{data:{data_source_urls:[PRIV_DS],query:PRIV_SQL}},function(ev){
           if(ev.type!=='data') return;
@@ -562,7 +614,7 @@
           var today=jstDate();
           priv=rows.map(function(r,i){
             var overdue = r.due && r.due<today;
-            return {r: overdue?(i===0?'S':'A'):'B', t:r.task, due: mdFromISO(r.due), soon:!!overdue, badge:(r.st==='着手中'?'着手中':undefined)};
+            return {r: overdue?(i===0?'S':'A'):'B', t:r.task, due: mdFromISO(r.due), soon:!!overdue, badge:(r.st==='着手中'?'着手中':undefined), pid: pidFromUrl(r.url)};
           });
           ok.notion=true; mark(); rerender();
         });
