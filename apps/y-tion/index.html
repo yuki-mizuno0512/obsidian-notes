@@ -252,6 +252,13 @@
   .addbtn{margin-top:11px;width:100%;appearance:none;border:1px dashed var(--hair);background:var(--panel-2);
     color:var(--ink-soft);font-family:inherit;font-weight:800;font-size:12px;padding:9px;border-radius:12px;cursor:pointer}
   .addbtn:active{opacity:.6}
+  .mgroup+.mgroup{margin-top:12px;border-top:1px solid var(--hair);padding-top:6px}
+  .mgh{display:flex;align-items:center;gap:8px;margin:4px 0 2px}
+  .mgname{font-size:12px;font-weight:800;color:var(--ink-soft);display:flex;align-items:center;gap:6px}
+  .mgcount{font-size:10px;font-weight:800;color:var(--sky);background:color-mix(in srgb,var(--sky) 18%,transparent);border-radius:999px;padding:1px 7px}
+  .archbtn{margin-left:auto;appearance:none;border:1px solid var(--hair);background:var(--panel-2);color:var(--ink-soft);
+    font-family:inherit;font-weight:800;font-size:10px;padding:5px 11px;border-radius:999px;cursor:pointer;white-space:nowrap}
+  .archbtn:active{opacity:.6}
   .addform{position:absolute;left:12px;right:12px;bottom:calc(66px + env(safe-area-inset-bottom,0px));
     background:var(--panel);border:1px solid var(--hair);border-radius:16px;box-shadow:var(--shadow);
     padding:14px;display:none;flex-direction:column;gap:10px;z-index:31}
@@ -415,10 +422,13 @@
     {t:'次に大事なこと', src:'今日', cls:'p', c:'var(--peach)', meta:''},
     {t:'3つ目', src:'今日', cls:'p', c:'var(--peach)', meta:''}
   ];
-  // __SYNC__ Work: NotionのMTG議事録アクションアイテム（未完了）で置換（プレースホルダ）
+  // Notion MTG議事録のアクションアイテム（未完了）から取得（2026-08-14 時点）
+  var MTG_WEEKLY='https://app.notion.com/p/MEETING_ID_1';
+  var MTG_SHINOHARA='https://app.notion.com/p/MEETING_ID_2';
+  // __SYNC__ Work: Notion「MTG TODO」DBの未完了で置換（会議ごと・プレースホルダ）
   var work=[
-    {r:'A', t:'業務タスク サンプル1', due:'—', badge:'MTG'},
-    {r:'B', t:'業務タスク サンプル2', due:'—', badge:'MTG'}
+    {r:'A', t:'業務タスク サンプル1', mtg:'会議A'},
+    {r:'B', t:'業務タスク サンプル2', mtg:'会議A'}
   ];
   // __SYNC__ Private: 表示時にNotionからライブ取得＋毎朝Routineで置換（プレースホルダ）
   var priv=[
@@ -494,6 +504,25 @@
     var footer = (sec==='private') ? '<button class="addbtn" data-add="private" type="button">＋ タスクを追加</button>' : '';
     return '<div class="card"'+(sec?' data-sec="'+sec+'"':'')+'><h3><span class="tick" style="background:'+tint+'">'+icon+'</span>'+title+'</h3>'+list+footer+'</div>';
   }
+  function workCard(){
+    var groups={}, order=[];
+    work.forEach(function(t){ var m=t.mtg||'その他'; if(!groups[m]){ groups[m]=[]; order.push(m); } groups[m].push(t); });
+    var body = order.map(function(m){
+      var items=groups[m];
+      var rows=items.map(function(t){
+        return '<div class="task" data-k="'+encodeURIComponent('work:'+t.t)+'"'+(t.pid?' data-pid="'+t.pid+'"':'')+'>'+
+          '<span class="rank rk-'+(t.r||'B')+'">'+(t.r||'B')+'</span>'+
+          '<span class="tt">'+t.t+'</span>'+
+          (t.link?'<a class="nlink2" href="'+t.link+'" target="_blank" rel="noopener" title="議事録を開く" aria-label="議事録を開く">↗</a>':'')+
+          '<span class="box"></span></div>';
+      }).join('');
+      var pids=items.map(function(t){return t.pid;}).filter(Boolean);
+      var arch = pids.length ? '<button class="archbtn" type="button" data-arch="'+encodeURIComponent(pids.join(','))+'" data-archname="'+m+'">🗄 一括完了</button>' : '';
+      return '<div class="mgroup"><div class="mgh"><span class="mgname">'+m+'<span class="mgcount">'+items.length+'</span></span>'+arch+'</div>'+rows+'</div>';
+    }).join('');
+    if(!body) body='<p style="padding:12px 6px;text-align:center;color:var(--ink-faint);font-size:13px;font-weight:600">未完了のWork TODOはありません 🎉</p>';
+    return '<div class="card" data-sec="work"><h3><span class="tick" style="background:'+sky+'">💼</span>タスク Work'+workTag+'</h3>'+body+'</div>';
+  }
   function mtgCard(){
     var rows = mtg.length ? mtg.map(function(e){
       return '<div class="ev'+(e.now?' now':'')+'"><span class="tm tabnum">'+e.tm+'</span>'+
@@ -562,6 +591,8 @@
   var syncTag='<span style="margin-left:auto;font-weight:800;color:var(--lav);text-transform:none;letter-spacing:0;font-size:10px;background:color-mix(in srgb,var(--lav) 16%,transparent);padding:2px 9px;border-radius:999px">🔗 Notion同期</span>';
   var TODO_TOP_URL='https://app.notion.com/p/90e5ccb2a8c6424292e7a924fc692b10';   // パーソナルタスク（TODO）トップ
   var privTag='<a href="'+TODO_TOP_URL+'" target="_blank" rel="noopener" style="margin-left:auto;font-weight:800;color:var(--lav);text-transform:none;letter-spacing:0;font-size:10px;background:color-mix(in srgb,var(--lav) 16%,transparent);padding:3px 10px;border-radius:999px;text-decoration:none">🔗 Notion ↗</a>';
+  var WORK_TOP_URL='https://app.notion.com/p/fba0499ca6624c93bfc4bc6999089da7';   // MTG TODO DB
+  var workTag='<a href="'+WORK_TOP_URL+'" target="_blank" rel="noopener" style="margin-left:auto;font-weight:800;color:var(--sky);text-transform:none;letter-spacing:0;font-size:10px;background:color-mix(in srgb,var(--sky) 18%,transparent);padding:3px 10px;border-radius:999px;text-decoration:none">🔗 Notion ↗</a>';
   var calTag='<span style="margin-left:auto;font-weight:800;color:var(--sky);text-transform:none;letter-spacing:0;font-size:10px;background:color-mix(in srgb,var(--sky) 18%,transparent);padding:2px 9px;border-radius:999px">📅 カレンダー</span>';
 
   var CUR_OPEN=false;
@@ -570,11 +601,11 @@
     CUR_OPEN=open;
     if(open){
       grid.innerHTML=
-        '<div class="col">'+ heroCard()+ focusCard()+ katanaCard()+ tasksCard('タスク Work'+syncTag,'💼',sky,work,0,'work')+ tasksCard('タスク Private'+privTag,'🏡',peach,priv,0,'private') +'</div>'+
+        '<div class="col">'+ heroCard()+ focusCard()+ katanaCard()+ workCard()+ tasksCard('タスク Private'+privTag,'🏡',peach,priv,0,'private') +'</div>'+
         '<div class="col">'+ mtgCard()+ weekCard()+ habitCard()+ inboxCard() +'</div>';
     } else {
       grid.innerHTML=
-        '<div class="col">'+ heroCard()+ focusCard()+ katanaCard()+ tasksCard('タスク Work'+syncTag,'💼',sky,work,3,'work')+ tasksCard('タスク Private'+privTag,'🏡',peach,priv,3,'private')+ habitCard()+ mtgCard()+ inboxCard() +'</div>';
+        '<div class="col">'+ heroCard()+ focusCard()+ katanaCard()+ workCard()+ tasksCard('タスク Private'+privTag,'🏡',peach,priv,3,'private')+ habitCard()+ mtgCard()+ inboxCard() +'</div>';
     }
   }
   render(false);
@@ -623,6 +654,20 @@
       var c=(err&&err.code)||'unknown';
       flashToast('⚠ 追加できませんでした ['+c+']');
     });
+  }
+
+  function archiveMeeting(pids,nm){
+    if(!(window.claude&&window.claude.use)){ flashToast('⚠ この画面では実行できません'); return; }
+    flashToast('アーカイブ中…');
+    window.claude.use('mcp').then(function(mcp){
+      if(!mcp){ var e=new Error('no'); e.code='not_granted'; return Promise.reject(e); }
+      return Promise.all(pids.map(function(pid){
+        return mcp.callTool('Notion','notion-update-page',{page_id:pid, command:'update_properties', properties:{'ステータス':'完了'}});
+      })).then(function(){
+        flashToast('✓ 「'+nm+'」を'+pids.length+'件 完了にしました');
+        if(mcp.invalidate){ try{ mcp.invalidate('Notion','notion-query-data-sources'); }catch(e){} }
+      });
+    }).catch(function(err){ var c=(err&&err.code)||'unknown'; flashToast('⚠ アーカイブ失敗 ['+c+']'); });
   }
 
   // 追加フォーム（やること＋期限＋優先度）
@@ -675,6 +720,13 @@
     if(e.target.closest('a')) return;                          // Notionリンク等はそのまま遷移
     var add=e.target.closest('[data-add]');                    // ＋ タスク追加
     if(add){ openAddForm(); return; }
+    var arch=e.target.closest('[data-arch]');                  // 会議単位の一括完了
+    if(arch){
+      var pids=decodeURIComponent(arch.getAttribute('data-arch')).split(',').filter(Boolean);
+      var nm=arch.getAttribute('data-archname')||'この会議';
+      if(pids.length) askConfirm('「'+nm+'」の'+pids.length+'件を全部完了にする？', function(){ archiveMeeting(pids,nm); });
+      return;
+    }
     var el=e.target.closest('.task,.step');
     if(!el || !grid.contains(el)) return;
     var pid=el.getAttribute('data-pid');
@@ -758,6 +810,18 @@
             var rank = r.pri || (overdue?(i===0?'S':'A'):'B');   // 優先度があれば優先。無ければ期限から推定
             return {r: rank, t:r.task, due: mdFromISO(r.due), soon:!!overdue, badge:(r.st==='着手中'?'着手中':undefined), pid: pidFromUrl(r.url), url:r.url};
           });
+          ok.notion=true; mark(); rerender();
+        });
+      }catch(e){}
+
+      // --- Work ← Notion「MTG TODO」DB（未完了・会議ごと） ---
+      var WORK_DS='collection://d1d345c1-d9fd-4883-a38c-a807d355e256';
+      var WORK_SQL='SELECT "やること" AS task, "会議" AS mtg, "優先度" AS pri, "議事録" AS link, url AS url FROM "'+WORK_DS+'" WHERE "ステータス" IS NULL OR "ステータス" != \'完了\' ORDER BY "会議", CASE "優先度" WHEN \'S\' THEN 0 WHEN \'A\' THEN 1 WHEN \'B\' THEN 2 WHEN \'C\' THEN 3 ELSE 4 END';
+      try{
+        mcp.watchTool('Notion','notion-query-data-sources',{data:{data_source_urls:[WORK_DS],query:WORK_SQL}},function(ev){
+          if(ev.type!=='data') return;
+          var p=ev.result&&ev.result.payload; var rows=p&&p.results?p.results:[];
+          work=rows.map(function(r){ return {r:(r.pri||'B'), t:r.task, mtg:(r.mtg||'その他'), link:r.link, pid:pidFromUrl(r.url)}; });
           ok.notion=true; mark(); rerender();
         });
       }catch(e){}
