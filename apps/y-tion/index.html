@@ -307,7 +307,7 @@
 
   // ---------- mock data (grounded in the user's configured skills) ----------
   var focus=[
-    {t:'今日の最重要タスク', src:'Work',  cls:'w', c:'var(--sky)', meta:'今日'},
+    {t:'添田さんのパートナー面接を調整する', src:'Work',  cls:'w', c:'var(--sky)', meta:'今週・X定例'},
     {t:'MTGのフォローTODO', src:'MTG', cls:'m', c:'var(--lav)', meta:'議事録由来'},
     {t:'私用の最優先タスク', src:'Private', cls:'p', c:'var(--peach)', meta:'今日'}
   ];
@@ -321,11 +321,11 @@
     {r:'A', t:'私用タスク サンプル1', due:'—'},
     {r:'B', t:'私用タスク サンプル2', due:'—'}
   ];
-  // __SYNC__ MTG: Googleカレンダーの当日イベント（会議）で置換（プレースホルダ）
+  // __SYNC__ MTG: Googleカレンダーの当日イベント（会議）で置換（プレースホルダ）。無い日は []
   var mtg=[
     {tm:'10:00', n:'会議サンプル1', m:'参加n名'},
     {tm:'14:00', n:'会議サンプル2', m:'オンライン'}
-  ];
+  ];   // 土曜は予定なし
   // __SYNC__ Week: Googleカレンダーの当週各日の会議件数で置換（プレースホルダ）。today に当日
   var week=[
     {d:'月',n:1,c:0},{d:'火',n:2,c:0},{d:'水',n:3,c:0},{d:'木',n:4,c:0,today:true},
@@ -359,7 +359,7 @@
   function heroCard(){
     var totalMtg=mtg.length, totalTodo=inbox.reduce(function(a,i){return a+(i.n||0);},0);
     return '<div class="card hero">'+
-      '<div class="hi">おはようございます、由貴さん ☀️</div>'+
+      '<div class="hi">'+(function(){var h=new Date().getHours();return (h<5?'こんばんは':h<11?'おはようございます':h<18?'こんにちは':'こんばんは')+'、由貴さん 🌿';})()+'</div>'+
       '<div class="big">今日は 深呼吸して 1つずつ。</div>'+
       '<div class="sums">'+
         '<span class="sumpill"><span class="d" style="background:var(--sky)"></span>MTG <b class="tabnum">'+totalMtg+'</b>件</span>'+
@@ -389,11 +389,12 @@
     return '<div class="card"><h3><span class="tick" style="background:'+tint+'">'+icon+'</span>'+title+'</h3>'+list+'</div>';
   }
   function mtgCard(){
-    var rows=mtg.map(function(e){
+    var rows = mtg.length ? mtg.map(function(e){
       return '<div class="ev'+(e.now?' now':'')+'"><span class="tm tabnum">'+e.tm+'</span>'+
         '<div class="bd"><div class="en">'+e.n+'</div>'+
         '<div class="em"><span>'+e.m+'</span></div></div></div>';
-    }).join('');
+    }).join('')
+    : '<div style="padding:14px 6px;text-align:center;color:var(--ink-faint);font-size:13px;font-weight:600">今日の予定はありません 🌿<br><span style="font-size:11px">ゆっくり過ごしましょう</span></div>';
     return '<div class="card"><h3><span class="tick" style="background:color-mix(in srgb,var(--sky) 22%,transparent)">📅</span>今日のMTG'+calTag+'</h3>'+
       '<div class="tl">'+rows+'</div></div>';
   }
@@ -452,7 +453,8 @@
   var sky='color-mix(in srgb,var(--sky) 22%,transparent)';
   var peach='color-mix(in srgb,var(--peach) 24%,transparent)';
   var syncTag='<span style="margin-left:auto;font-weight:800;color:var(--lav);text-transform:none;letter-spacing:0;font-size:10px;background:color-mix(in srgb,var(--lav) 16%,transparent);padding:2px 9px;border-radius:999px">🔗 Notion同期</span>';
-  var calTag='<span style="margin-left:auto;font-weight:800;color:var(--sky);text-transform:none;letter-spacing:0;font-size:10px;background:color-mix(in srgb,var(--sky) 18%,transparent);padding:2px 9px;border-radius:999px">📅 カレンダー同期</span>';
+  var SYNC_DATE='m/d';   // 最終同期日（スナップショット）
+  var calTag='<span style="margin-left:auto;font-weight:800;color:var(--sky);text-transform:none;letter-spacing:0;font-size:10px;background:color-mix(in srgb,var(--sky) 18%,transparent);padding:2px 9px;border-radius:999px">📅 同期 '+SYNC_DATE+'</span>';
 
   function render(open){
     if(open){
