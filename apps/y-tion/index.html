@@ -338,10 +338,11 @@
   function isDone(k,def){ return DONE.hasOwnProperty(k)?DONE[k]:!!def; }
 
   // ---------- mock data (grounded in the user's configured skills) ----------
+  // __SYNC__ Focus: 表示時に♡Private&Private♡カレンダーのピックアップ3から取得（プレースホルダ）
   var focus=[
-    {t:'今日の最重要タスク', src:'Work',  cls:'w', c:'var(--sky)', meta:'今日'},
-    {t:'MTGのフォローTODO', src:'MTG', cls:'m', c:'var(--lav)', meta:'議事録由来'},
-    {t:'私用の最優先タスク', src:'Private', cls:'p', c:'var(--peach)', meta:'今日'}
+    {t:'今日の最重要タスク', src:'今日', cls:'p', c:'var(--peach)', meta:''},
+    {t:'次に大事なこと', src:'今日', cls:'p', c:'var(--peach)', meta:''},
+    {t:'3つ目', src:'今日', cls:'p', c:'var(--peach)', meta:''}
   ];
   // __SYNC__ Work: NotionのMTG議事録アクションアイテム（未完了）で置換（プレースホルダ）
   var work=[
@@ -659,6 +660,30 @@
             }
             week=wk;
             ok.cal=true; mark(); rerender();
+          });
+      }catch(e){}
+
+      // --- 今日のフォーカス ← ♡Private&Private♡ カレンダーの当日ピックアップ3（①②③…（X分）） ---
+      var PICK_CAL='0l5ii97mvra3jikrt7f3736s50@group.calendar.google.com';
+      function parsePick3(title){
+        return String(title).split(/[①②③④⑤⑥⑦⑧⑨]/).slice(1).map(function(seg){
+          seg=seg.trim();
+          var m=seg.match(/（([^）]*)）\s*$/);
+          return {t: seg.replace(/（[^）]*）\s*$/,'').trim(), meta:(m?m[1]:'')};
+        }).filter(function(x){return x.t;});
+      }
+      try{
+        mcp.watchTool('Google Calendar','list_events',
+          {calendarId:PICK_CAL, startTime:today+'T00:00:00+09:00', endTime:addDays(today,1)+'T00:00:00+09:00', timeZone:'Asia/Tokyo', orderBy:'startTime', pageSize:20},
+          function(ev){
+            if(ev.type!=='data') return;
+            var p=ev.result&&ev.result.payload; var evs=(p&&p.events)?p.events:[];
+            var pick=null;
+            for(var i=0;i<evs.length;i++){ var t=(evs[i].summary||'').trim(); if(t.indexOf('①')===0){ pick=parsePick3(t); break; } }
+            if(pick && pick.length){
+              focus = pick.slice(0,3).map(function(x){ return {t:x.t, src:'今日', cls:'p', c:'var(--peach)', meta:(x.meta||'')}; });
+              rerender();
+            }
           });
       }catch(e){}
     }).catch(function(){ setLive('warn'); });
