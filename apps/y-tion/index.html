@@ -415,7 +415,6 @@
       return '<div class="task'+(done?' done':'')+'" data-k="'+encodeURIComponent(k)+'"'+(t.pid?' data-pid="'+t.pid+'"':'')+'><span class="rank rk-'+t.r+'">'+t.r+'</span>'+
         '<span class="tt">'+t.t+'</span>'+
         (t.badge?'<span class="badge">'+t.badge+'</span>':'')+
-        (t.url?'<a class="nlink2" href="'+t.url+'" target="_blank" rel="noopener" title="Notionで開く" aria-label="Notionで開く">↗</a>':'')+
         '<span class="due'+(t.soon?' soon':'')+'">'+t.due+'</span>'+
         '<span class="box"></span></div>';
     }).join('');
@@ -487,6 +486,8 @@
   var sky='color-mix(in srgb,var(--sky) 22%,transparent)';
   var peach='color-mix(in srgb,var(--peach) 24%,transparent)';
   var syncTag='<span style="margin-left:auto;font-weight:800;color:var(--lav);text-transform:none;letter-spacing:0;font-size:10px;background:color-mix(in srgb,var(--lav) 16%,transparent);padding:2px 9px;border-radius:999px">🔗 Notion同期</span>';
+  var TODO_TOP_URL='https://app.notion.com/90e5ccb2a8c6424292e7a924fc692b10';   // パーソナルタスク（TODO）トップ
+  var privTag='<a href="'+TODO_TOP_URL+'" target="_blank" rel="noopener" style="margin-left:auto;font-weight:800;color:var(--lav);text-transform:none;letter-spacing:0;font-size:10px;background:color-mix(in srgb,var(--lav) 16%,transparent);padding:3px 10px;border-radius:999px;text-decoration:none">🔗 Notion ↗</a>';
   var calTag='<span style="margin-left:auto;font-weight:800;color:var(--sky);text-transform:none;letter-spacing:0;font-size:10px;background:color-mix(in srgb,var(--sky) 18%,transparent);padding:2px 9px;border-radius:999px">📅 カレンダー</span>';
 
   var CUR_OPEN=false;
@@ -495,11 +496,11 @@
     CUR_OPEN=open;
     if(open){
       grid.innerHTML=
-        '<div class="col">'+ heroCard()+ focusCard()+ katanaCard()+ tasksCard('タスク Work'+syncTag,'💼',sky,work,0,'work')+ tasksCard('タスク Private'+syncTag,'🏡',peach,priv,0,'private') +'</div>'+
+        '<div class="col">'+ heroCard()+ focusCard()+ katanaCard()+ tasksCard('タスク Work'+syncTag,'💼',sky,work,0,'work')+ tasksCard('タスク Private'+privTag,'🏡',peach,priv,0,'private') +'</div>'+
         '<div class="col">'+ mtgCard()+ weekCard()+ habitCard()+ inboxCard() +'</div>';
     } else {
       grid.innerHTML=
-        '<div class="col">'+ heroCard()+ focusCard()+ katanaCard()+ tasksCard('タスク Work'+syncTag,'💼',sky,work,3,'work')+ tasksCard('タスク Private'+syncTag,'🏡',peach,priv,3,'private')+ habitCard()+ mtgCard()+ inboxCard() +'</div>';
+        '<div class="col">'+ heroCard()+ focusCard()+ katanaCard()+ tasksCard('タスク Work'+syncTag,'💼',sky,work,3,'work')+ tasksCard('タスク Private'+privTag,'🏡',peach,priv,3,'private')+ habitCard()+ mtgCard()+ inboxCard() +'</div>';
     }
   }
   render(false);
