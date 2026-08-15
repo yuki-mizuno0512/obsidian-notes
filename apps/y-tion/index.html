@@ -208,6 +208,13 @@
   .legend i{width:9px;height:9px;border-radius:3px}
   .valueline{margin:10px 0 0;font-size:11.5px;color:var(--ink-faint);line-height:1.65}
 
+  .task,.step{cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:8px}
+  .task:active,.step:active{opacity:.55}
+  .card{scroll-margin-top:60px}
+  .card.flash{animation:flash 1.1s ease}
+  @keyframes flash{0%{box-shadow:0 0 0 2px var(--lav)}100%{box-shadow:0 6px 20px -14px rgba(120,90,170,.35)}}
+  @media (prefers-reduced-motion: reduce){ .card.flash{animation:none} }
+
   .dock{display:flex;justify-content:space-around;padding:10px 8px 4px;margin-top:4px}
   .dock button{appearance:none;border:0;background:transparent;cursor:pointer;font-family:inherit;
     display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink-faint);font-size:9px;font-weight:700;padding:4px}
@@ -267,11 +274,11 @@
       <div class="canvas">
         <div class="grid" id="grid"></div>
         <nav class="dock" aria-label="メインナビ">
-          <button aria-current="true"><span class="ic">🏠</span>ホーム</button>
-          <button><span class="ic">💼</span>Work</button>
-          <button><span class="ic">🏡</span>Private</button>
-          <button><span class="ic">📅</span>予定</button>
-          <button><span class="ic">📥</span>受信</button>
+          <button data-target="home" aria-current="true"><span class="ic">🏠</span>ホーム</button>
+          <button data-target="work"><span class="ic">💼</span>Work</button>
+          <button data-target="private"><span class="ic">🏡</span>Private</button>
+          <button data-target="sched"><span class="ic">📅</span>予定</button>
+          <button data-target="inbox"><span class="ic">📥</span>受信</button>
         </nav>
       </div>
     </div>
@@ -305,9 +312,15 @@
     root.setAttribute('data-theme',isDark?'light':'dark');
   });
 
+  // ---------- チェック状態の保存（端末ローカル） ----------
+  function loadDone(){ try{return JSON.parse(localStorage.getItem('ytion_done')||'{}');}catch(e){return {};} }
+  var DONE=loadDone();
+  function saveDone(){ try{localStorage.setItem('ytion_done',JSON.stringify(DONE));}catch(e){} }
+  function isDone(k,def){ return DONE.hasOwnProperty(k)?DONE[k]:!!def; }
+
   // ---------- mock data (grounded in the user's configured skills) ----------
   var focus=[
-    {t:'添田さんのパートナー面接を調整する', src:'Work',  cls:'w', c:'var(--sky)', meta:'今週・X定例'},
+    {t:'今日の最重要タスク', src:'Work',  cls:'w', c:'var(--sky)', meta:'今日'},
     {t:'MTGのフォローTODO', src:'MTG', cls:'m', c:'var(--lav)', meta:'議事録由来'},
     {t:'私用の最優先タスク', src:'Private', cls:'p', c:'var(--peach)', meta:'今日'}
   ];
@@ -358,12 +371,12 @@
 
   function heroCard(){
     var totalMtg=mtg.length, totalTodo=inbox.reduce(function(a,i){return a+(i.n||0);},0);
-    return '<div class="card hero">'+
+    return '<div class="card hero" data-sec="home">'+
       '<div class="hi">'+(function(){var h=new Date().getHours();return (h<5?'こんばんは':h<11?'おはようございます':h<18?'こんにちは':'こんばんは')+'、由貴さん 🌿';})()+'</div>'+
       '<div class="big">今日は 深呼吸して 1つずつ。</div>'+
       '<div class="sums">'+
         '<span class="sumpill"><span class="d" style="background:var(--sky)"></span>MTG <b class="tabnum">'+totalMtg+'</b>件</span>'+
-        '<span class="sumpill"><span class="d" style="background:var(--peach)"></span>フォーカス <b class="tabnum">3</b>件</span>'+
+        '<span class="sumpill"><span class="d" style="background:var(--peach)"></span>フォーカス <b class="tabnum">'+focus.length+'</b>件</span>'+
         '<span class="sumpill"><span class="d" style="background:var(--butter)"></span>要対応 <b class="tabnum">'+totalTodo+'</b></span>'+
       '</div>'+
       '<div class="valueline">できることを、ひとつずつ 🌿</div></div>';
@@ -378,15 +391,16 @@
     return '<div class="card"><h3><span class="tick" style="background:color-mix(in srgb,var(--lav) 22%,transparent)">⭐</span>今日のフォーカス</h3>'+
       '<div class="focus">'+rows+'</div></div>';
   }
-  function tasksCard(title,icon,tint,arr,limit){
+  function tasksCard(title,icon,tint,arr,limit,sec){
     var list=arr.slice(0,limit||arr.length).map(function(t){
-      return '<div class="task"><span class="rank rk-'+t.r+'">'+t.r+'</span>'+
+      var k='task:'+t.t, done=isDone(k,false);
+      return '<div class="task'+(done?' done':'')+'" data-k="'+encodeURIComponent(k)+'"><span class="rank rk-'+t.r+'">'+t.r+'</span>'+
         '<span class="tt">'+t.t+'</span>'+
         (t.badge?'<span class="badge">'+t.badge+'</span>':'')+
         '<span class="due'+(t.soon?' soon':'')+'">'+t.due+'</span>'+
         '<span class="box"></span></div>';
     }).join('');
-    return '<div class="card"><h3><span class="tick" style="background:'+tint+'">'+icon+'</span>'+title+'</h3>'+list+'</div>';
+    return '<div class="card"'+(sec?' data-sec="'+sec+'"':'')+'><h3><span class="tick" style="background:'+tint+'">'+icon+'</span>'+title+'</h3>'+list+'</div>';
   }
   function mtgCard(){
     var rows = mtg.length ? mtg.map(function(e){
@@ -395,7 +409,7 @@
         '<div class="em"><span>'+e.m+'</span></div></div></div>';
     }).join('')
     : '<div style="padding:14px 6px;text-align:center;color:var(--ink-faint);font-size:13px;font-weight:600">今日の予定はありません 🌿<br><span style="font-size:11px">ゆっくり過ごしましょう</span></div>';
-    return '<div class="card"><h3><span class="tick" style="background:color-mix(in srgb,var(--sky) 22%,transparent)">📅</span>今日のMTG'+calTag+'</h3>'+
+    return '<div class="card" data-sec="sched"><h3><span class="tick" style="background:color-mix(in srgb,var(--sky) 22%,transparent)">📅</span>今日のMTG'+calTag+'</h3>'+
       '<div class="tl">'+rows+'</div></div>';
   }
   function weekCard(){
@@ -417,7 +431,8 @@
   function katanaCard(){
     function seg(title,color,arr){
       var steps=arr.map(function(s){
-        return '<div class="step'+(s.on?' on':'')+'"><span class="ck"></span>'+
+        var k='step:'+s.lbl, on=isDone(k,s.on);
+        return '<div class="step'+(on?' on':'')+'" data-k="'+encodeURIComponent(k)+'"><span class="ck"></span>'+
           '<span class="tmn">'+(s.tm||'')+'</span>'+
           '<span class="lbl">'+s.lbl+'</span></div>';
       }).join('');
@@ -446,7 +461,7 @@
         '<span class="il"><b>'+i.l+(i.live?' <span style="font-size:9px;font-weight:800;color:var(--sky);vertical-align:middle">●LIVE</span>':'')+'</b><small>'+i.s+'</small></span>'+
         '<span class="num'+((i.n!=null)?' num-'+i.k:' z')+' tabnum">'+val+'</span></div>';
     }).join('');
-    return '<div class="card"><h3><span class="tick" style="background:color-mix(in srgb,var(--butter) 28%,transparent)">📥</span>要対応インボックス</h3>'+
+    return '<div class="card" data-sec="inbox"><h3><span class="tick" style="background:color-mix(in srgb,var(--butter) 28%,transparent)">📥</span>要対応インボックス</h3>'+
       '<div class="inbox">'+rows+'</div></div>';
   }
 
@@ -459,14 +474,38 @@
   function render(open){
     if(open){
       grid.innerHTML=
-        '<div class="col">'+ heroCard()+ focusCard()+ katanaCard()+ tasksCard('タスク Work'+syncTag,'💼',sky,work)+ tasksCard('タスク Private'+syncTag,'🏡',peach,priv) +'</div>'+
+        '<div class="col">'+ heroCard()+ focusCard()+ katanaCard()+ tasksCard('タスク Work'+syncTag,'💼',sky,work,0,'work')+ tasksCard('タスク Private'+syncTag,'🏡',peach,priv,0,'private') +'</div>'+
         '<div class="col">'+ mtgCard()+ weekCard()+ habitCard()+ inboxCard() +'</div>';
     } else {
       grid.innerHTML=
-        '<div class="col">'+ heroCard()+ focusCard()+ katanaCard()+ tasksCard('タスク Private'+syncTag,'🏡',peach,priv,3)+ habitCard()+ mtgCard()+ inboxCard() +'</div>';
+        '<div class="col">'+ heroCard()+ focusCard()+ katanaCard()+ tasksCard('タスク Work'+syncTag,'💼',sky,work,3,'work')+ tasksCard('タスク Private'+syncTag,'🏡',peach,priv,3,'private')+ habitCard()+ mtgCard()+ inboxCard() +'</div>';
     }
   }
   render(false);
+
+  // ===== 押せるように：チェック操作＋下部ナビ =====
+  grid.addEventListener('click', function(e){
+    var el=e.target.closest('.task,.step');
+    if(!el || !grid.contains(el)) return;
+    var k=el.getAttribute('data-k'); if(!k) return;
+    k=decodeURIComponent(k);
+    var cls=el.classList.contains('task')?'done':'on';
+    el.classList.toggle(cls);
+    DONE[k]=el.classList.contains(cls); saveDone();
+  });
+  var dockBtns=document.querySelectorAll('.dock button');
+  Array.prototype.forEach.call(dockBtns, function(btn){
+    btn.addEventListener('click', function(){
+      Array.prototype.forEach.call(dockBtns,function(b){b.setAttribute('aria-current','false');});
+      btn.setAttribute('aria-current','true');
+      var t=btn.getAttribute('data-target');
+      var card=grid.querySelector('[data-sec="'+t+'"]') || grid.querySelector('[data-sec="home"]');
+      if(card){
+        card.scrollIntoView({behavior:'smooth', block:'start'});
+        card.classList.remove('flash'); void card.offsetWidth; card.classList.add('flash');
+      }
+    });
+  });
 
   // ===== 実機モード：実際のデバイスの折り曲げに自動追従 =====
   var mqFold=null;
