@@ -406,7 +406,9 @@
   }
   function tasksCard(title,icon,tint,arr,limit,sec){
     var list=arr.slice(0,limit||arr.length).map(function(t){
-      var k='task:'+t.t, done=isDone(k,false);
+      var k='task:'+t.t;
+      // Notionライブ(pidあり)はNotionが正 → 端末内チェックは無視（一覧に居る＝未完了）。それ以外のみ端末内状態。
+      var done = t.pid ? false : isDone(k,false);
       return '<div class="task'+(done?' done':'')+'" data-k="'+encodeURIComponent(k)+'"'+(t.pid?' data-pid="'+t.pid+'"':'')+'><span class="rank rk-'+t.r+'">'+t.r+'</span>'+
         '<span class="tt">'+t.t+'</span>'+
         (t.badge?'<span class="badge">'+t.badge+'</span>':'')+
