@@ -21,18 +21,18 @@
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --ground:#1A161F; --panel:#241E2B; --panel-2:#2E2738; --hair:#392F44;
-      --ink:#ECE3F4; --ink-soft:#B1A6C0; --ink-faint:#79708A;
-      --lav:#B9A7F0; --lav-soft:#8F7BD0; --peach:#F3B79E; --peach-soft:#C98C74;
-      --mint:#8FDCC0; --mint-soft:#5AA98C; --sky:#9CC8F2; --sky-soft:#5F8CC0;
-      --butter:#EBCB7C;
+      --ground:#131019; --panel:#221C2C; --panel-2:#2D2640; --hair:#3A3150;
+      --ink:#F1EAF7; --ink-soft:#BBB1CE; --ink-faint:#847A98;
+      --lav:#C6B7F7; --lav-soft:#9A87DC; --peach:#F9C3A9; --peach-soft:#D0967C;
+      --mint:#A0E9CF; --mint-soft:#63B394; --sky:#ABD5F8; --sky-soft:#6693C8;
+      --butter:#F2D78C;
       --frame:#0E0B12; --frame-2:#1C1622; --crease:rgba(255,255,255,.06);
       --good:#8FDCC0; --warn:#EBCB7C; --crit:#F09AA2;
       --shadow:0 28px 65px -22px rgba(0,0,0,.7);
     }
   }
   :root[data-theme="dark"]{
-    --ground:#1A161F; --panel:#241E2B; --panel-2:#2E2738; --hair:#392F44;
+    --ground:#131019; --panel:#221C2C; --panel-2:#2D2640; --hair:#3A3150;
     --ink:#ECE3F4; --ink-soft:#B1A6C0; --ink-faint:#79708A;
     --lav:#B9A7F0; --lav-soft:#8F7BD0; --peach:#F3B79E; --peach-soft:#C98C74;
     --mint:#8FDCC0; --mint-soft:#5AA98C; --sky:#9CC8F2; --sky-soft:#5F8CC0;
@@ -46,8 +46,9 @@
   html,body{margin:0}
   body{
     background:
-      radial-gradient(90% 60% at 15% -5%, color-mix(in srgb,var(--lav) 14%,transparent), transparent 60%),
-      radial-gradient(80% 55% at 100% 0%, color-mix(in srgb,var(--peach) 12%,transparent), transparent 55%),
+      radial-gradient(90% 60% at 12% -8%, color-mix(in srgb,var(--lav) 20%,transparent), transparent 60%),
+      radial-gradient(85% 55% at 100% -2%, color-mix(in srgb,var(--peach) 16%,transparent), transparent 58%),
+      radial-gradient(70% 50% at 50% 108%, color-mix(in srgb,var(--mint) 12%,transparent), transparent 60%),
       var(--ground);
     color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased;
     line-height:1.55; min-height:100vh; padding:26px 16px 60px;
@@ -94,7 +95,7 @@
   .col{display:grid; gap:13px; min-width:0}
 
   .card{background:var(--panel); border:1px solid var(--hair); border-radius:var(--r); padding:16px; min-width:0;
-    box-shadow:0 6px 20px -14px rgba(120,90,170,.35)}
+    box-shadow:0 10px 26px -18px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.05)}
   .card h3{margin:0 0 12px; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint);
     font-weight:800; display:flex; align-items:center; gap:8px}
   .card h3 .tick{width:16px;height:16px;border-radius:6px;display:grid;place-items:center;font-size:10px}
