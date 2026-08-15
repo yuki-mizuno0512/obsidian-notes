@@ -222,6 +222,9 @@
   .toast .no{background:var(--panel-2);color:var(--ink-soft)}
   .task,.step{cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:8px}
   .task[data-pid]:active{opacity:.55}
+  .task .nlink2{flex:0 0 auto;width:24px;height:24px;border-radius:7px;display:grid;place-items:center;
+    text-decoration:none;color:var(--lav);background:color-mix(in srgb,var(--lav) 14%,transparent);font-size:13px;font-weight:800}
+  .task .nlink2:active{opacity:.55}
   .task:active,.step:active{opacity:.55}
   .card{scroll-margin-top:60px}
   .card.flash{animation:flash 1.1s ease}
@@ -412,6 +415,7 @@
       return '<div class="task'+(done?' done':'')+'" data-k="'+encodeURIComponent(k)+'"'+(t.pid?' data-pid="'+t.pid+'"':'')+'><span class="rank rk-'+t.r+'">'+t.r+'</span>'+
         '<span class="tt">'+t.t+'</span>'+
         (t.badge?'<span class="badge">'+t.badge+'</span>':'')+
+        (t.url?'<a class="nlink2" href="'+t.url+'" target="_blank" rel="noopener" title="Notionで開く" aria-label="Notionで開く">↗</a>':'')+
         '<span class="due'+(t.soon?' soon':'')+'">'+t.due+'</span>'+
         '<span class="box"></span></div>';
     }).join('');
@@ -541,6 +545,7 @@
   }
 
   grid.addEventListener('click', function(e){
+    if(e.target.closest('a')) return;                          // Notionリンク等はそのまま遷移
     var el=e.target.closest('.task,.step');
     if(!el || !grid.contains(el)) return;
     var pid=el.getAttribute('data-pid');
@@ -621,7 +626,7 @@
           var today=jstDate();
           priv=rows.map(function(r,i){
             var overdue = r.due && r.due<today;
-            return {r: overdue?(i===0?'S':'A'):'B', t:r.task, due: mdFromISO(r.due), soon:!!overdue, badge:(r.st==='着手中'?'着手中':undefined), pid: pidFromUrl(r.url)};
+            return {r: overdue?(i===0?'S':'A'):'B', t:r.task, due: mdFromISO(r.due), soon:!!overdue, badge:(r.st==='着手中'?'着手中':undefined), pid: pidFromUrl(r.url), url:r.url};
           });
           ok.notion=true; mark(); rerender();
         });
