@@ -487,6 +487,7 @@
       return '<div class="task'+(done?' done':'')+'" data-k="'+encodeURIComponent(k)+'"'+(t.pid?' data-pid="'+t.pid+'"':'')+'><span class="rank rk-'+t.r+'">'+t.r+'</span>'+
         '<span class="tt">'+t.t+'</span>'+
         (t.badge?'<span class="badge">'+t.badge+'</span>':'')+
+        (t.link?'<a class="nlink2" href="'+t.link+'" target="_blank" rel="noopener" title="議事録を開く" aria-label="議事録を開く">↗</a>':'')+
         '<span class="due'+(t.soon?' soon':'')+'">'+t.due+'</span>'+
         '<span class="box"></span></div>';
     }).join('');
