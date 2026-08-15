@@ -42,6 +42,28 @@
     --shadow:0 28px 65px -22px rgba(0,0,0,.7);
   }
 
+  /* ホスト非依存の強制テーマ（body直下でトークン上書き＝メディアクエリより確実に優先） */
+  body.tl{
+    --ground:#FAF8F3; --panel:#FFFFFF; --panel-2:#F5EEF8; --hair:#ECE3F0;
+    --ink:#4B4658; --ink-soft:#8A8398; --ink-faint:#B7AFC4;
+    --lav:#9F8AE0; --lav-soft:#C7B6F2; --peach:#F0A98C; --peach-soft:#F8C9B4;
+    --mint:#6FC7A8; --mint-soft:#AEE3CF; --sky:#7EB6E8; --sky-soft:#BEDCF5;
+    --butter:#E2C169;
+    --frame:#E7DDEE; --frame-2:#D9CCE4; --crease:rgba(120,90,160,.12);
+    --good:#6FC7A8; --warn:#E0A94E; --crit:#D4503F;
+    --shadow:0 24px 55px -24px rgba(120,90,170,.45);
+  }
+  body.td{
+    --ground:#131019; --panel:#221C2C; --panel-2:#2D2640; --hair:#3A3150;
+    --ink:#F1EAF7; --ink-soft:#BBB1CE; --ink-faint:#847A98;
+    --lav:#C6B7F7; --lav-soft:#9A87DC; --peach:#F9C3A9; --peach-soft:#D0967C;
+    --mint:#A0E9CF; --mint-soft:#63B394; --sky:#ABD5F8; --sky-soft:#6693C8;
+    --butter:#F2D78C;
+    --frame:#0E0B12; --frame-2:#1C1622; --crease:rgba(255,255,255,.06);
+    --good:#A0E9CF; --warn:#F2D78C; --crit:#F09AA2;
+    --shadow:0 28px 65px -22px rgba(0,0,0,.7);
+  }
+
   *{box-sizing:border-box}
   html,body{margin:0}
   body{
@@ -361,12 +383,20 @@
   }
   bF.addEventListener('click',function(){setState(false);});
   bO.addEventListener('click',function(){setState(true);});
-  var root=document.documentElement;
-  document.getElementById('btn-theme').addEventListener('click',function(){
-    var cur=root.getAttribute('data-theme');
-    var dark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;
-    var isDark=cur?cur==='dark':dark;
-    root.setAttribute('data-theme',isDark?'light':'dark');
+  var THEMES=['auto','light','dark'];
+  var themeBtn=document.getElementById('btn-theme');
+  function applyTheme(t){
+    document.body.classList.remove('tl','td');
+    if(t==='light') document.body.classList.add('tl');
+    else if(t==='dark') document.body.classList.add('td');
+    if(themeBtn) themeBtn.textContent = (t==='light'?'☀️ Light':t==='dark'?'🌙 Dark':'◐ Auto');
+    try{ localStorage.setItem('ytion_theme', t); }catch(e){}
+  }
+  var savedTheme='auto'; try{ savedTheme=localStorage.getItem('ytion_theme')||'auto'; }catch(e){}
+  applyTheme(savedTheme);
+  themeBtn.addEventListener('click',function(){
+    var cur='auto'; try{ cur=localStorage.getItem('ytion_theme')||'auto'; }catch(e){}
+    applyTheme(THEMES[(THEMES.indexOf(cur)+1)%THEMES.length]);
   });
 
   // ---------- チェック状態の保存（端末ローカル） ----------
