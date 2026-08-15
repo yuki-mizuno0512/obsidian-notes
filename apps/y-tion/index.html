@@ -208,6 +208,10 @@
   .legend i{width:9px;height:9px;border-radius:3px}
   .valueline{margin:10px 0 0;font-size:11.5px;color:var(--ink-faint);line-height:1.65}
 
+  .livechip{font-size:10px;font-weight:800;letter-spacing:.02em;padding:3px 9px;border-radius:999px;
+    background:var(--panel-2);border:1px solid var(--hair);color:var(--ink-faint);white-space:nowrap}
+  .livechip.live{color:var(--mint);background:color-mix(in srgb,var(--mint) 16%,transparent);border-color:transparent}
+  .livechip.warn{color:var(--warn);background:color-mix(in srgb,var(--warn) 16%,transparent);border-color:transparent}
   .task,.step{cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:8px}
   .task:active,.step:active{opacity:.55}
   .card{scroll-margin-top:60px}
@@ -253,7 +257,7 @@
 </style>
 
 <div class="topbar">
-  <div class="brand"><span class="mark">Y-tion</span><span class="sub">Personal Cockpit</span></div>
+  <div class="brand"><span class="mark">Y-tion</span><span class="sub">Personal Cockpit</span><span id="livestatus" class="livechip">📸 スナップショット</span></div>
   <div class="controls">
     <div class="seg" role="group" aria-label="デバイスの状態">
       <button id="btn-fold" aria-pressed="true">折 Cover</button>
@@ -334,12 +338,9 @@
     {r:'A', t:'私用タスク サンプル1', due:'—'},
     {r:'B', t:'私用タスク サンプル2', due:'—'}
   ];
-  // __SYNC__ MTG: Googleカレンダーの当日イベント（会議）で置換（プレースホルダ）。無い日は []
-  var mtg=[
-    {tm:'10:00', n:'会議サンプル1', m:'参加n名'},
-    {tm:'14:00', n:'会議サンプル2', m:'オンライン'}
-  ];   // 土曜は予定なし
-  // __SYNC__ Week: Googleカレンダーの当週各日の会議件数で置換（プレースホルダ）。today に当日
+  // __SYNC__ MTG: 表示時に Google カレンダーからライブ取得（無い日は []）。プレースホルダ
+  var mtg=[];   // 土曜は予定なし
+  // __SYNC__ Week: 表示時に Google カレンダーからライブ取得。プレースホルダ
   var week=[
     {d:'月',n:1,c:0},{d:'火',n:2,c:0},{d:'水',n:3,c:0},{d:'木',n:4,c:0,today:true},
     {d:'金',n:5,c:0},{d:'土',n:6,c:0},{d:'日',n:7,c:0}
@@ -468,10 +469,12 @@
   var sky='color-mix(in srgb,var(--sky) 22%,transparent)';
   var peach='color-mix(in srgb,var(--peach) 24%,transparent)';
   var syncTag='<span style="margin-left:auto;font-weight:800;color:var(--lav);text-transform:none;letter-spacing:0;font-size:10px;background:color-mix(in srgb,var(--lav) 16%,transparent);padding:2px 9px;border-radius:999px">🔗 Notion同期</span>';
-  var SYNC_DATE='m/d';   // 最終同期日（スナップショット）
-  var calTag='<span style="margin-left:auto;font-weight:800;color:var(--sky);text-transform:none;letter-spacing:0;font-size:10px;background:color-mix(in srgb,var(--sky) 18%,transparent);padding:2px 9px;border-radius:999px">📅 同期 '+SYNC_DATE+'</span>';
+  var calTag='<span style="margin-left:auto;font-weight:800;color:var(--sky);text-transform:none;letter-spacing:0;font-size:10px;background:color-mix(in srgb,var(--sky) 18%,transparent);padding:2px 9px;border-radius:999px">📅 カレンダー</span>';
 
+  var CUR_OPEN=false;
+  function rerender(){ render(CUR_OPEN); }
   function render(open){
+    CUR_OPEN=open;
     if(open){
       grid.innerHTML=
         '<div class="col">'+ heroCard()+ focusCard()+ katanaCard()+ tasksCard('タスク Work'+syncTag,'💼',sky,work,0,'work')+ tasksCard('タスク Private'+syncTag,'🏡',peach,priv,0,'private') +'</div>'+
@@ -525,6 +528,75 @@
   if(mqFold && mqFold.addEventListener) mqFold.addEventListener('change', syncToDevice);
   if(navigator.devicePosture && navigator.devicePosture.addEventListener) navigator.devicePosture.addEventListener('change', syncToDevice);
   syncToDevice();
+
+  // ===== 片方向ライブ読み込み（開くたびに Notion / Googleカレンダー から最新取得） =====
+  var livechip=document.getElementById('livestatus');
+  function setLive(state){ // 'live' | 'warn' | 'snap'
+    if(!livechip) return;
+    livechip.className='livechip'+(state==='live'?' live':state==='warn'?' warn':'');
+    livechip.textContent = state==='live'?'🔄 ライブ同期': state==='warn'?'⚠️ 同期できません（スナップショット）':'📸 スナップショット';
+  }
+  function jstDate(d){ return (d||new Date()).toLocaleDateString('en-CA',{timeZone:'Asia/Tokyo'}); } // YYYY-MM-DD
+  function hhmm(iso){ try{return new Date(iso).toLocaleTimeString('ja-JP',{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit',hour12:false});}catch(e){return '';} }
+  function pad(n){return (n<10?'0':'')+n;}
+  function mdFromISO(s){ if(!s) return '—'; var p=s.slice(0,10).split('-'); return p.length===3?(parseInt(p[1],10)+'/'+parseInt(p[2],10)):'—'; }
+
+  function initLive(){
+    var C = (typeof window!=='undefined' && window.claude && window.claude.use) ? window.claude : null;
+    if(!C){ setLive('snap'); return; }        // ローカル/直接オープン等：スナップショットのまま
+    C.use('mcp').then(function(mcp){
+      if(!mcp){ setLive('snap'); return; }
+      var ok={notion:false,cal:false};
+      function mark(){ setLive((ok.notion||ok.cal)?'live':'warn'); }
+      setLive('warn'); // 取得できるまでは未同期扱い
+
+      // --- Private ← Notion パーソナルタスク（未完了） ---
+      var PRIV_DS='collection://af353e4a-dcf7-4e3f-bad1-966adff2d840';
+      var PRIV_SQL='SELECT "やること" AS task, "ステータス" AS st, "date:期限:start" AS due FROM "'+PRIV_DS+'" WHERE "ステータス" IS NULL OR "ステータス" != \'完了\' ORDER BY (due IS NULL), date(due) ASC';
+      try{
+        mcp.watchTool('Notion','notion-query-data-sources',{data:{data_source_urls:[PRIV_DS],query:PRIV_SQL}},function(ev){
+          if(ev.type!=='data') return;
+          var p=ev.result&&ev.result.payload; var rows=p&&p.results?p.results:[];
+          var today=jstDate();
+          priv=rows.map(function(r,i){
+            var overdue = r.due && r.due<today;
+            return {r: overdue?(i===0?'S':'A'):'B', t:r.task, due: mdFromISO(r.due), soon:!!overdue, badge:(r.st==='着手中'?'着手中':undefined)};
+          });
+          ok.notion=true; mark(); rerender();
+        });
+      }catch(e){}
+
+      // --- 今日のMTG & 今週 ← Google カレンダー ---
+      var today=jstDate();
+      var wd=new Date(today+'T00:00:00+09:00').getDay(); // 0=Sun..6=Sat
+      var monOff=(wd===0?-6:1-wd);
+      function addDays(iso,n){ var d=new Date(iso+'T00:00:00+09:00'); d.setDate(d.getDate()+n); return jstDate(d); }
+      var monday=addDays(today,monOff), nextMon=addDays(monday,7);
+      var isMeeting=function(e){ return e.eventType!=='FOCUS_TIME' && e.attendees && e.attendees.length>=1 && e.start && e.start.dateTime; };
+      try{
+        mcp.watchTool('Google Calendar','list_events',
+          {startTime:monday+'T00:00:00+09:00', endTime:nextMon+'T00:00:00+09:00', timeZone:'Asia/Tokyo', orderBy:'startTime', pageSize:100},
+          function(ev){
+            if(ev.type!=='data') return;
+            var p=ev.result&&ev.result.payload; var evs=(p&&p.events)?p.events:[];
+            // 今日のMTG
+            mtg=evs.filter(function(e){ return isMeeting(e) && jstDate(new Date(e.start.dateTime))===today; })
+                   .map(function(e){ return {tm:hhmm(e.start.dateTime), n:e.summary||'(無題)', m:'参加'+e.attendees.length+'名'}; });
+            // 今週の会議件数
+            var labels=['日','月','火','水','木','金','土'];
+            var wk=[];
+            for(var i=0;i<7;i++){
+              var dISO=addDays(monday,i); var dd=new Date(dISO+'T00:00:00+09:00');
+              var cnt=evs.filter(function(e){ return isMeeting(e) && jstDate(new Date(e.start.dateTime))===dISO; }).length;
+              wk.push({d:labels[dd.getDay()], n:parseInt(dISO.slice(8,10),10), c:cnt, today:(dISO===today)});
+            }
+            week=wk;
+            ok.cal=true; mark(); rerender();
+          });
+      }catch(e){}
+    }).catch(function(){ setLive('warn'); });
+  }
+  initLive();
 })();
 </script>
 
