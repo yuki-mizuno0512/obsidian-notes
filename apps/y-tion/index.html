@@ -220,6 +220,11 @@
   .toast button{appearance:none;border:0;border-radius:999px;font-family:inherit;font-weight:800;font-size:12px;padding:7px 15px;cursor:pointer;flex:0 0 auto}
   .toast .yes{background:var(--mint);color:#fff}
   .toast .no{background:var(--panel-2);color:var(--ink-soft)}
+  .toast .tin{flex:1;min-width:0;border:1px solid var(--hair);border-radius:10px;padding:8px 10px;font-family:inherit;font-size:13px;background:var(--panel-2);color:var(--ink)}
+  .toast .tin:focus{outline:2px solid var(--lav);outline-offset:1px}
+  .addbtn{margin-top:11px;width:100%;appearance:none;border:1px dashed var(--hair);background:var(--panel-2);
+    color:var(--ink-soft);font-family:inherit;font-weight:800;font-size:12px;padding:9px;border-radius:12px;cursor:pointer}
+  .addbtn:active{opacity:.6}
   .task,.step{cursor:pointer;-webkit-tap-highlight-color:transparent;border-radius:8px}
   .task[data-pid]:active{opacity:.55}
   .task .nlink2{flex:0 0 auto;width:24px;height:24px;border-radius:7px;display:grid;place-items:center;
@@ -299,7 +304,7 @@
         <button data-target="sched"><span class="ic">📅</span>予定</button>
         <button data-target="inbox"><span class="ic">📥</span>受信</button>
       </nav>
-      <div class="toast" id="toast"><span class="msg"></span><button class="no" type="button">やめる</button><button class="yes" type="button">はい</button></div>
+      <div class="toast" id="toast"><span class="msg"></span><input class="tin" type="text" placeholder="新しいPrivateタスク" style="display:none"><button class="no" type="button">やめる</button><button class="yes" type="button">はい</button></div>
     </div>
   </div>
 </div>
@@ -419,7 +424,8 @@
         '<span class="due'+(t.soon?' soon':'')+'">'+t.due+'</span>'+
         '<span class="box"></span></div>';
     }).join('');
-    return '<div class="card"'+(sec?' data-sec="'+sec+'"':'')+'><h3><span class="tick" style="background:'+tint+'">'+icon+'</span>'+title+'</h3>'+list+'</div>';
+    var footer = (sec==='private') ? '<button class="addbtn" data-add="private" type="button">＋ タスクを追加</button>' : '';
+    return '<div class="card"'+(sec?' data-sec="'+sec+'"':'')+'><h3><span class="tick" style="background:'+tint+'">'+icon+'</span>'+title+'</h3>'+list+footer+'</div>';
   }
   function mtgCard(){
     var rows = mtg.length ? mtg.map(function(e){
@@ -508,20 +514,47 @@
 
   // ===== 押せるように：チェック操作＋下部ナビ＋Notion書き込み =====
   var toast=document.getElementById('toast');
-  var toastYes=toast.querySelector('.yes'), toastNo=toast.querySelector('.no'), toastMsg=toast.querySelector('.msg');
+  var toastYes=toast.querySelector('.yes'), toastNo=toast.querySelector('.no'), toastMsg=toast.querySelector('.msg'), tin=toast.querySelector('.tin');
   var pendingYes=null, toastTimer=null;
   function askConfirm(msg,onYes){
-    pendingYes=onYes; toastMsg.textContent=msg;
-    toastYes.style.display=''; toastNo.textContent='やめる';
+    pendingYes=onYes; toastMsg.textContent=msg; toastMsg.style.display=''; tin.style.display='none';
+    toastYes.style.display=''; toastYes.textContent='はい'; toastNo.textContent='やめる';
     toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(hideToast,9000);
   }
+  function askInput(placeholder,onSubmit){
+    pendingYes=function(v){ v=(v||'').trim(); if(v) onSubmit(v); };
+    toastMsg.style.display='none'; tin.style.display=''; tin.value=''; tin.placeholder=placeholder||'入力';
+    toastYes.style.display=''; toastYes.textContent='追加'; toastNo.textContent='やめる';
+    toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(hideToast,30000);
+    setTimeout(function(){ try{tin.focus();}catch(e){} },60);
+  }
   function flashToast(msg){
-    pendingYes=null; toastMsg.textContent=msg; toastYes.style.display='none'; toastNo.textContent='閉じる';
+    pendingYes=null; toastMsg.textContent=msg; toastMsg.style.display=''; tin.style.display='none';
+    toastYes.style.display='none'; toastNo.textContent='閉じる';
     toast.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(hideToast,2600);
   }
   function hideToast(){ toast.classList.remove('show'); pendingYes=null; }
-  toastYes.addEventListener('click',function(){ var f=pendingYes; hideToast(); if(f) f(); });
+  toastYes.addEventListener('click',function(){ var f=pendingYes; var v=tin.value; hideToast(); if(f) f(v); });
   toastNo.addEventListener('click', hideToast);
+  tin.addEventListener('keydown', function(e){ if(e.key==='Enter'){ e.preventDefault(); toastYes.click(); } });
+
+  function createNotionTask(text){
+    if(!(window.claude&&window.claude.use)){ flashToast('⚠ この画面では追加できません'); return; }
+    flashToast('追加中…');
+    window.claude.use('mcp').then(function(mcp){
+      if(!mcp){ var e=new Error('no'); e.code='not_granted'; return Promise.reject(e); }
+      return mcp.callTool('Notion','notion-create-pages',{
+        parent:{type:'data_source_id', data_source_id:'af353e4a-dcf7-4e3f-bad1-966adff2d840'},
+        pages:[{properties:{'やること':text, 'ステータス':'未着手', '種別':'私用'}}]
+      }).then(function(){
+        flashToast('✓ 追加しました');
+        if(mcp.invalidate){ try{ mcp.invalidate('Notion','notion-query-data-sources'); }catch(e){} }
+      });
+    }).catch(function(err){
+      var c=(err&&err.code)||'unknown';
+      flashToast('⚠ 追加できませんでした ['+c+']');
+    });
+  }
 
   function completeNotion(el,pid){
     if(!(window.claude&&window.claude.use)){ flashToast('⚠ この画面では書き込みできません'); return; }
@@ -548,6 +581,8 @@
 
   grid.addEventListener('click', function(e){
     if(e.target.closest('a')) return;                          // Notionリンク等はそのまま遷移
+    var add=e.target.closest('[data-add]');                    // ＋ タスク追加
+    if(add){ askInput('新しいPrivateタスク', createNotionTask); return; }
     var el=e.target.closest('.task,.step');
     if(!el || !grid.contains(el)) return;
     var pid=el.getAttribute('data-pid');
