@@ -231,11 +231,19 @@ button,input,select,textarea{font:inherit;color:inherit;}
   border-left:2px solid var(--rule);padding-left:9px;
 }
 .note.check{border-left-color:var(--warn);color:var(--warn);}
-.alt{
-  display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-mid);
-  background:var(--surface-sunk);border-radius:8px;padding:6px 9px;
+/* 目印の切り替え（カード内） */
+.optbar{display:flex;gap:5px;flex-wrap:wrap;}
+.optbar button{
+  display:flex;align-items:baseline;gap:6px;cursor:pointer;
+  border:1px solid var(--rule);background:var(--surface-sunk);border-radius:9px;
+  padding:5px 10px;font-size:12.5px;color:var(--ink-mid);
 }
-.alt .p{font-family:var(--disp);font-weight:700;font-size:17px;color:var(--ink);}
+.optbar button:hover{border-color:var(--signal);}
+.optbar button[aria-pressed="true"]{
+  background:var(--signal);border-color:var(--signal);color:#fff;font-weight:700;
+}
+.optbar .mini{font-family:var(--disp);font-weight:700;font-size:15px;letter-spacing:.01em;color:var(--ink);}
+.optbar button[aria-pressed="true"] .mini{color:#fff;}
 .stub-body{padding:14px 12px;font-size:13px;color:var(--ink-dim);}
 
 /* ---------------- empty / footer ---------------- */
@@ -284,6 +292,11 @@ dialog::backdrop{background:rgba(8,12,18,.55);backdrop-filter:blur(2px);}
 .grid3{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:7px;}
 .legrow{border:1px solid var(--rule-soft);border-radius:11px;padding:9px;margin-bottom:8px;background:var(--surface-sunk);}
 .legrow .rm{float:right;border:0;background:none;color:var(--ink-dim);cursor:pointer;font-size:12px;padding:0;}
+.subleg{border-top:1px dashed var(--rule);margin-top:9px;padding-top:9px;}
+.subleg:first-of-type{border-top:0;margin-top:0;padding-top:0;}
+.subhead{display:flex;justify-content:space-between;align-items:center;font-size:11px;
+  color:var(--ink-dim);font-weight:600;margin-bottom:4px;}
+.subhead button{border:0;background:none;color:var(--ink-dim);cursor:pointer;font-size:11px;padding:0;}
 .addleg{border:1px dashed var(--rule);background:none;border-radius:9px;padding:6px 12px;
   font-size:12.5px;color:var(--ink-mid);cursor:pointer;width:100%;}
 .sheet-actions{display:flex;gap:8px;margin-top:16px;}
@@ -350,6 +363,11 @@ dialog::backdrop{background:rgba(8,12,18,.55);backdrop-filter:blur(2px);}
     号車の並びは編成図で、当たりの車両が路線カラーで塗られます。
   </div>
   <div style="margin-top:10px">
+    行き先ごとに1枚のカードにまとめてあります。
+    <b>エスカレーター / エレベーター / 階段</b>があるところは、
+    カードの中のボタンで切り替えられます（ボタンにも号車-ドアを出しているので、押さなくても見比べられます）。
+  </div>
+  <div style="margin-top:10px">
     元メモそのままの表記は残してあります。数が編成と合わないものには
     <span class="tag bad">要確認</span> を付けました。
   </div>
@@ -378,17 +396,17 @@ dialog::backdrop{background:rgba(8,12,18,.55);backdrop-filter:blur(2px);}
     <div class="field"><label for="f-via">乗り換え・補足（任意）</label><input id="f-via" placeholder="中野乗り換え"></div>
 
     <div class="field">
-      <label>のりば</label>
-      <div id="legList"></div>
-      <button type="button" class="addleg" id="addLeg">＋ 乗り継ぎを足す</button>
+      <label>のりば（目印ごとに足せます）</label>
+      <div id="optList"></div>
+      <button type="button" class="addleg" id="addOpt">＋ 別の目印ののりばを足す</button>
     </div>
 
     <div class="field">
-      <label>目印</label>
+      <label>そのほかの目印</label>
       <div class="tagpick" id="tagPick"></div>
     </div>
 
-    <div class="field"><label for="f-memo">メモ（任意）</label><textarea id="f-memo" placeholder="エレベーターはもっと後ろ、など"></textarea></div>
+    <div class="field"><label for="f-memo">メモ（任意）</label><textarea id="f-memo" placeholder="中野の乗り換えがエスカレーター、など"></textarea></div>
 
     <div class="sheet-actions">
       <button type="button" id="cancelBtn">やめる</button>
@@ -434,80 +452,110 @@ const SECTIONS = [
   {id:"misc",  title:"その他メモ"}
 ];
 
-const TAGS = ["エスカレーター","エレベーター","階段","乗り換え","避ける"];
-
-/* ================= 元メモから起こしたデータ ================= */
-/* leg: {line, car, door, pos}  pos は「一番後ろ」など号車内の言い回し */
+/* ================= 元メモから起こしたデータ =================
+   1枚のカード＝ひとつの区間。
+   opts に「エスカレーター / エレベーター / 階段」ごとののりばを並べて、
+   カードの中で切り替えられるようにしている。
+   leg: {line, car, door, pos}   pos は「一番後ろ」など号車内の言い回し   */
 const BASE = [
   /* --- rana行き --- */
   {id:"rana-route", sec:"rana", dir:"go", from:"高円寺", to:"rana", via:"中央線 → 山手線 → 新幹線",
-   legs:[{line:"JC",car:11,door:1},{line:"JY",car:2,door:4},{line:"SK",car:11}],
-   alts:[{line:"JY",car:5,door:3,tag:"エレベーター"}],
-   tags:[],
+   opts:[
+     {tag:"", legs:[{line:"JC",car:11,door:1},{line:"JY",car:2,door:4},{line:"SK",car:11}]},
+     {tag:"エレベーター", legs:[{line:"JC",car:11,door:1},{line:"JY",car:5,door:3},{line:"SK",car:11}],
+      memo:"山手線だけ 5-3 に変える。"}
+   ],
    check:"山手線の元メモは「2|4」。2号車4番ドアと読みました。"},
 
   {id:"rana-tx", sec:"rana", dir:"go", from:"TX", to:"東京駅乗り換え",
-   legs:[{line:"TX",car:8,door:4}],
-   alts:[{line:"TX",car:9,door:1,tag:"別案"}],
+   opts:[
+     {tag:"", legs:[{line:"TX",car:8,door:4}]},
+     {tag:"別案", legs:[{line:"TX",car:9,door:1}]}
+   ],
    tags:["乗り換え"],
    check:"元メモは「TX／東京駅乗り換え／8-4・9-1」。TXは6両編成で東京駅に乗り入れていないため、路線名の解釈が要確認です。"},
 
   /* --- 総武線 --- */
-  {id:"sobu-esc", sec:"sobu", dir:"back", from:"", to:"高円寺",
-   legs:[{line:"JB",car:4,door:2}], tags:["エスカレーター"]},
-  {id:"sobu-elv", sec:"sobu", dir:"back", from:"", to:"高円寺",
-   legs:[{line:"JB",car:5,door:2}], tags:["エレベーター"]},
+  {id:"sobu-koenji", sec:"sobu", dir:"back", from:"", to:"高円寺", via:"総武線",
+   opts:[
+     {tag:"エスカレーター", legs:[{line:"JB",car:4,door:2}]},
+     {tag:"エレベーター",   legs:[{line:"JB",car:5,door:2}]}
+   ]},
 
   /* --- 中央線 --- */
   {id:"chuo-yotsuya", sec:"chuo", dir:"go", from:"高円寺", to:"四ツ谷",
-   legs:[{line:"JC",car:10,door:2}],
-   alts:[{line:"JC",car:8,door:4,tag:"階段"}],
-   tags:["エスカレーター"],
-   memo:"エレベーターはもっと後ろ（号車は未記録）。"},
+   opts:[
+     {tag:"エスカレーター", legs:[{line:"JC",car:10,door:2}]},
+     {tag:"階段",           legs:[{line:"JC",car:8,door:4}]},
+     {tag:"エレベーター",   legs:[{line:"JC",pos:"もっと後ろ"}],
+      memo:"元メモは「えれべーたはもっと後ろ」だけ。号車は未記録。"}
+   ]},
   {id:"chuo-shinjuku", sec:"chuo", dir:"go", from:"高円寺", to:"新宿", via:"中央線から南口",
-   legs:[{line:"JC",car:3,door:1}], tags:[]},
+   opts:[{tag:"", legs:[{line:"JC",car:3,door:1}]}]},
   {id:"chuo-tokyo", sec:"chuo", dir:"back", from:"東京", to:"高円寺", via:"中野乗り換え",
-   legs:[{line:"JC",car:3,door:5}], tags:["エスカレーター","乗り換え"],
-   memo:"後ろの方。中野の乗り換えがエスカレーター。",
+   opts:[{tag:"エスカレーター", legs:[{line:"JC",car:3,door:5}], memo:"後ろの方。中野の乗り換えがエスカレーター。"}],
+   tags:["乗り換え"],
    check:"元メモは「3-5」。4扉編成に5番ドアはないので要確認です。"},
-  {id:"chuo-shinjuku-back", sec:"chuo", dir:"back", from:"新宿", to:"高円寺",
-   legs:[{line:"JC",car:8,door:1}], tags:["エスカレーター"]},
-  {id:"chuo-elv", sec:"chuo", dir:"back", from:"", to:"高円寺",
-   legs:[{line:"JC",car:3,pos:"4号車寄り"}], tags:["エレベーター"],
-   memo:"元メモ「4号車に近い3号車」。"},
+  {id:"chuo-koenji", sec:"chuo", dir:"back", from:"新宿", to:"高円寺",
+   opts:[
+     {tag:"エスカレーター", legs:[{line:"JC",car:8,door:1}]},
+     {tag:"エレベーター",   legs:[{line:"JC",car:3,pos:"4号車寄り"}],
+      memo:"元メモ「4号車に近い3号車」。出発駅の指定はなかったので、中央線で高円寺に着くとき共通。"}
+   ]},
 
   /* --- 山手線＋総武線 --- */
   {id:"jyjb-harajuku", sec:"jy_jb", dir:"go", from:"高円寺", to:"原宿",
-   legs:[{line:"JB",car:8},{line:"JY",car:4,door:2}], tags:["乗り換え"]},
-  {id:"jyjb-back", sec:"jy_jb", dir:"back", from:"山手線", to:"高円寺", via:"新宿乗り換え",
-   legs:[{line:"JY",car:8,pos:"一番後ろ"}], tags:["乗り換え"]},
+   opts:[{tag:"", legs:[{line:"JB",car:8},{line:"JY",car:4,door:2}]}],
+   tags:["乗り換え"]},
+  {id:"jyjb-koenji", sec:"jy_jb", dir:"back", from:"山手線", to:"高円寺", via:"新宿乗り換え",
+   opts:[
+     {tag:"", legs:[{line:"JY",car:8,pos:"一番後ろ"}]},
+     {tag:"エレベーター", legs:[{line:"JY",car:7,door:3},{line:"JB",car:5,door:2}],
+      memo:"高円寺でエレベーターに乗りたいときの組み合わせ。"}
+   ],
+   tags:["乗り換え"]},
   {id:"jy-yotsuya", sec:"jy_jb", dir:"back", from:"原宿", to:"四ツ谷",
-   legs:[{line:"JY",car:4,door:4}], tags:[]},
-  {id:"jyjb-elv", sec:"jy_jb", dir:"back", from:"", to:"高円寺",
-   legs:[{line:"JY",car:7,door:3},{line:"JB",car:5,door:2}], tags:["エレベーター","乗り換え"],
-   memo:"高円寺でエレベーターに乗りたいときの組み合わせ。"},
+   opts:[{tag:"", legs:[{line:"JY",car:4,door:4}]}]},
 
   /* --- 総武線＋中央線 --- */
   {id:"jbjc-nakano", sec:"jb_jc", dir:"go", from:"総武線", to:"中央線", via:"中野乗り換え",
-   legs:[{line:"JB",car:3,door:3}], tags:["乗り換え"],
-   memo:"元メモ「3号車の前から3番目の扉」。"},
+   opts:[{tag:"", legs:[{line:"JB",car:3,door:3}], memo:"元メモ「3号車の前から3番目の扉」。"}],
+   tags:["乗り換え"]},
   {id:"jbjc-back", sec:"jb_jc", dir:"back", from:"山手線", to:"",
-   legs:[{line:"JY",car:4,door:4}], tags:["エスカレーター","避ける"], warn:true,
+   opts:[{tag:"エスカレーター", legs:[{line:"JY",car:4,door:4}]}],
+   tags:["避ける"], warn:true,
    memo:"元メモ「いや、これは中央線乗ってから微妙だった」。使わない方向で。"},
 
   /* --- 有楽町線＋総武線 --- */
   {id:"y-kojimachi", sec:"y_jb", dir:"back", from:"麹町", to:"高円寺", via:"麹町 → 市ケ谷",
-   legs:[{line:"Y",car:8,door:1}], tags:["乗り換え"]},
+   opts:[{tag:"", legs:[{line:"Y",car:8,door:1}]}],
+   tags:["乗り換え"]},
 
   /* --- 山手線＋中央線（未記入） --- */
   {id:"jyjc-stub", sec:"jy_jc", stub:true, dir:"none",
    memo:"元メモは「ん？」のまま。乗ったときに書き足してください。"},
 
   /* --- その他 --- */
-  {id:"ebisu", sec:"misc", dir:"none", from:"恵比寿", to:"",
-   legs:[{line:"JA",car:2,door:3}], tags:["階段","避ける"], warn:true,
+  {id:"ebisu", sec:"misc", dir:"none", from:"恵比寿", to:"", via:"埼京線",
+   opts:[{tag:"階段", legs:[{line:"JA",car:2,door:3}]}],
+   tags:["避ける"], warn:true,
    memo:"2-3で降りると階段。別のドアから降りるのが吉。"}
 ];
+
+/* 旧形式（legs / alts）で保存されたデータを opts 形式にそろえる */
+function normalize(e){
+  if(e.opts) return e;
+  const o = {tag:"", legs:e.legs || []};
+  const known = ["エスカレーター","エレベーター","階段"];
+  const t = (e.tags||[]).find(x => known.includes(x));
+  if(t) o.tag = t;
+  const opts = (e.legs && e.legs.length) ? [o] : [];
+  for(const a of (e.alts||[])) opts.push({tag:a.tag || "別案", legs:[a]});
+  const out = Object.assign({}, e, {opts});
+  out.tags = (e.tags||[]).filter(x => !known.includes(x));
+  delete out.legs; delete out.alts;
+  return out;
+}
 
 /* ================= 保存状態 ================= */
 const KEY = "noriba.v1";
@@ -525,32 +573,54 @@ function entries(){
   const out = [];
   for(const b of BASE){
     if(S.hidden.includes(b.id)) continue;
-    out.push(S.overrides[b.id] ? Object.assign({}, b, S.overrides[b.id]) : b);
+    out.push(normalize(S.overrides[b.id] ? Object.assign({}, b, S.overrides[b.id]) : b));
   }
-  return out.concat(S.custom);
+  return out.concat(S.custom.map(normalize));
 }
 
 function searchText(e){
   const parts = [e.from, e.to, e.via, e.memo, e.check, (e.tags||[]).join(" ")];
-  for(const l of (e.legs||[]).concat(e.alts||[])){
-    const L = LINES[l.line];
-    if(L) parts.push(L.name, L.mark);
-    if(l.car) parts.push(l.car + "号車", l.car + (l.door?("-"+l.door):""));
-    if(l.pos) parts.push(l.pos);
+  for(const o of (e.opts||[])){
+    parts.push(o.tag, o.memo);
+    for(const l of (o.legs||[])){
+      const L = LINES[l.line];
+      if(L) parts.push(L.name, L.mark);
+      if(l.car) parts.push(l.car + "号車", l.car + (l.door?("-"+l.door):""));
+      if(l.pos) parts.push(l.pos);
+    }
   }
   return parts.filter(Boolean).join(" ").toLowerCase();
+}
+
+function optTags(e){
+  const t = new Set(e.tags||[]);
+  for(const o of (e.opts||[])) if(o.tag) t.add(o.tag);
+  return t;
 }
 
 function match(e){
   if(F.favOnly && !S.favs.includes(e.id)) return false;
   if(F.dir !== "all" && e.dir !== F.dir) return false;
   if(F.tags.size){
-    const t = new Set(e.tags||[]);
-    for(const l of (e.alts||[])) if(l.tag) t.add(l.tag);
+    const t = optTags(e);
     for(const need of F.tags) if(!t.has(need)) return false;
   }
   if(F.q && !searchText(e).includes(F.q)) return false;
   return true;
+}
+
+/* カード内で今どののりばを開いているか（メモリのみ） */
+const sel = {};
+function selIndex(e){
+  const n = (e.opts||[]).length;
+  if(!n) return 0;
+  if(sel[e.id] != null && sel[e.id] < n) return sel[e.id];
+  /* 絞り込み中の目印があればそれを開く。無ければ先頭 */
+  for(const need of F.tags){
+    const i = e.opts.findIndex(o => o.tag === need);
+    if(i >= 0) return i;
+  }
+  return 0;
 }
 
 /* ================= 描画 ================= */
@@ -659,8 +729,30 @@ function card(e){
     return c;
   }
 
-  const legs = el("div","legs");
-  for(const l of (e.legs||[])){
+  const body = el("div","legs");
+  const opts = e.opts || [];
+  const cur = selIndex(e);
+
+  /* 目印の切り替え（エスカレーター / エレベーター / 階段…）。
+     切り替える前から、どのドアかがチップに出ているようにする。 */
+  if(opts.length > 1){
+    const bar = el("div","optbar");
+    bar.setAttribute("role","group");
+    bar.setAttribute("aria-label","のりばの選び方");
+    opts.forEach((o, i) => {
+      const b = el("button");
+      b.type = "button";
+      b.setAttribute("aria-pressed", String(i === cur));
+      b.appendChild(el("span",null, o.tag || "指定なし"));
+      b.appendChild(el("span","mini", legLabel(o.legs)));
+      b.onclick = () => { sel[e.id] = i; c.replaceWith(card(e)); };
+      bar.appendChild(b);
+    });
+    body.appendChild(bar);
+  }
+
+  const o = opts[cur];
+  for(const l of ((o && o.legs) || [])){
     const box = el("div","leg");
     const head = el("div","leg-head");
     head.appendChild(lineBadge(l.line));
@@ -669,18 +761,11 @@ function card(e){
     box.appendChild(head);
     const f = formation(l.line, l.car); if(f) box.appendChild(f);
     const d = doorStrip(l.line, l.door); if(d) box.appendChild(d);
-    legs.appendChild(box);
-  }
-
-  for(const a of (e.alts||[])){
-    const row = el("div","alt");
-    row.appendChild(lineBadge(a.line));
-    row.appendChild(el("span","p", a.car + (a.door ? "-" + a.door : "号車")));
-    row.appendChild(el("span",null, a.tag || "別案"));
-    legs.appendChild(row);
+    body.appendChild(box);
   }
 
   const tags = (e.tags||[]).slice();
+  if(opts.length === 1 && opts[0].tag) tags.unshift(opts[0].tag);
   if(e.check) tags.push("要確認");
   if(tags.length){
     const tw = el("div","tags");
@@ -689,13 +774,23 @@ function card(e){
                 : (t==="避ける"||t==="要確認") ? "tag bad" : "tag";
       tw.appendChild(el("span",cls,t));
     }
-    legs.appendChild(tw);
+    body.appendChild(tw);
   }
-  if(e.memo) legs.appendChild(el("div","note", e.memo));
-  if(e.check) legs.appendChild(el("div","note check", e.check));
+  if(o && o.memo) body.appendChild(el("div","note", o.memo));
+  if(e.memo) body.appendChild(el("div","note", e.memo));
+  if(e.check) body.appendChild(el("div","note check", e.check));
 
-  c.appendChild(legs);
+  c.appendChild(body);
   return c;
+}
+
+/* 「10-2」「8号車」「3号車ほか」など、チップに出す短い位置表記 */
+function legLabel(legs){
+  const l = (legs||[]).find(x => x.car || x.pos);
+  if(!l) return "";
+  let s = l.car ? (l.door ? l.car + "-" + l.door : l.car + "号車") : l.pos;
+  if((legs||[]).length > 1) s += " ほか";
+  return s;
 }
 
 function render(){
@@ -783,8 +878,9 @@ function toast(msg){
 /* ================= エディタ ================= */
 const dlg = document.getElementById("editor");
 let editing = null;      // 編集中の entry（null なら新規）
-let legDraft = [];
+let optDraft = [];       // [{tag, legs:[...], memo}]
 let tagDraft = new Set();
+const OPT_TAGS = ["","エスカレーター","エレベーター","階段","別案"];
 
 const secSel = document.getElementById("f-sec");
 SECTIONS.concat([{id:"__other", title:"追加したメモ"}]).forEach(s => {
@@ -792,7 +888,7 @@ SECTIONS.concat([{id:"__other", title:"追加したメモ"}]).forEach(s => {
 });
 
 const tagPick = document.getElementById("tagPick");
-TAGS.forEach(t => {
+["乗り換え","避ける"].forEach(t => {
   const b = el("button",null,t); b.type="button"; b.setAttribute("aria-pressed","false");
   b.onclick = () => {
     if(tagDraft.has(t)) tagDraft.delete(t); else tagDraft.add(t);
@@ -801,53 +897,100 @@ TAGS.forEach(t => {
   tagPick.appendChild(b);
 });
 
-function drawLegs(){
-  const host = document.getElementById("legList");
+function legFields(l){
+  const box = el("div");
+  const g = el("div","grid3");
+
+  const f1 = el("div","field");
+  f1.appendChild(el("label",null,"路線"));
+  const sel = el("select");
+  Object.keys(LINES).forEach(k => {
+    const o = el("option",null,LINES[k].name); o.value = k;
+    if(k === l.line) o.selected = true;
+    sel.appendChild(o);
+  });
+  sel.onchange = () => { l.line = sel.value; };
+  f1.appendChild(sel); g.appendChild(f1);
+
+  const f2 = el("div","field");
+  f2.appendChild(el("label",null,"号車"));
+  const ci = el("input"); ci.type="number"; ci.min="1"; ci.inputMode="numeric";
+  ci.value = l.car || ""; ci.oninput = () => { l.car = ci.value ? +ci.value : null; };
+  f2.appendChild(ci); g.appendChild(f2);
+
+  const f3 = el("div","field");
+  f3.appendChild(el("label",null,"ドア"));
+  const di = el("input"); di.type="number"; di.min="1"; di.inputMode="numeric";
+  di.value = l.door || ""; di.oninput = () => { l.door = di.value ? +di.value : null; };
+  f3.appendChild(di); g.appendChild(f3);
+
+  box.appendChild(g);
+
+  const f4 = el("div","field"); f4.style.marginBottom="0";
+  f4.appendChild(el("label",null,"言い回し（任意・例: 一番後ろ）"));
+  const pi = el("input"); pi.value = l.pos || "";
+  pi.oninput = () => { l.pos = pi.value || null; };
+  f4.appendChild(pi); box.appendChild(f4);
+  return box;
+}
+
+function drawOpts(){
+  const host = document.getElementById("optList");
   host.textContent = "";
-  legDraft.forEach((l, i) => {
+  optDraft.forEach((o, oi) => {
     const row = el("div","legrow");
-    if(legDraft.length > 1){
-      const rm = el("button","rm","削除"); rm.type="button";
-      rm.onclick = () => { legDraft.splice(i,1); drawLegs(); };
+
+    if(optDraft.length > 1){
+      const rm = el("button","rm","この目印を削除"); rm.type = "button";
+      rm.onclick = () => { optDraft.splice(oi,1); drawOpts(); };
       row.appendChild(rm);
     }
-    const g = el("div","grid3");
 
-    const f1 = el("div","field");
-    f1.appendChild(el("label",null,"路線"));
-    const sel = el("select");
-    Object.keys(LINES).forEach(k => {
-      const o = el("option",null,LINES[k].name); o.value = k;
-      if(k === l.line) o.selected = true;
-      sel.appendChild(o);
+    const ft = el("div","field");
+    ft.appendChild(el("label",null,"目印"));
+    const ts = el("select");
+    OPT_TAGS.forEach(t => {
+      const op = el("option",null, t || "指定なし"); op.value = t;
+      if(t === (o.tag||"")) op.selected = true;
+      ts.appendChild(op);
     });
-    sel.onchange = () => { l.line = sel.value; };
-    f1.appendChild(sel); g.appendChild(f1);
+    ts.onchange = () => { o.tag = ts.value; };
+    ft.appendChild(ts); row.appendChild(ft);
 
-    const f2 = el("div","field");
-    f2.appendChild(el("label",null,"号車"));
-    const ci = el("input"); ci.type="number"; ci.min="1"; ci.inputMode="numeric";
-    ci.value = l.car || ""; ci.oninput = () => { l.car = ci.value ? +ci.value : null; };
-    f2.appendChild(ci); g.appendChild(f2);
+    o.legs.forEach((l, li) => {
+      const lw = el("div","subleg");
+      if(o.legs.length > 1){
+        const h = el("div","subhead");
+        h.appendChild(el("span",null, (li+1) + "本目"));
+        const rl = el("button",null,"削除"); rl.type="button";
+        rl.onclick = () => { o.legs.splice(li,1); drawOpts(); };
+        h.appendChild(rl);
+        lw.appendChild(h);
+      }
+      lw.appendChild(legFields(l));
+      row.appendChild(lw);
+    });
 
-    const f3 = el("div","field");
-    f3.appendChild(el("label",null,"ドア"));
-    const di = el("input"); di.type="number"; di.min="1"; di.inputMode="numeric";
-    di.value = l.door || ""; di.oninput = () => { l.door = di.value ? +di.value : null; };
-    f3.appendChild(di); g.appendChild(f3);
+    const add = el("button","addleg","＋ 乗り継ぎを足す"); add.type = "button";
+    add.style.marginTop = "8px";
+    add.onclick = () => { o.legs.push({line:"JC",car:null,door:null}); drawOpts(); };
+    row.appendChild(add);
 
-    row.appendChild(g);
-
-    const f4 = el("div","field"); f4.style.marginBottom="0";
-    f4.appendChild(el("label",null,"言い回し（任意・例: 一番後ろ）"));
-    const pi = el("input"); pi.value = l.pos || "";
-    pi.oninput = () => { l.pos = pi.value || null; };
-    f4.appendChild(pi); row.appendChild(f4);
+    const fm = el("div","field"); fm.style.margin = "9px 0 0";
+    fm.appendChild(el("label",null,"この目印だけのメモ（任意）"));
+    const mi = el("input"); mi.value = o.memo || "";
+    mi.oninput = () => { o.memo = mi.value || ""; };
+    fm.appendChild(mi); row.appendChild(fm);
 
     host.appendChild(row);
   });
 }
-document.getElementById("addLeg").onclick = () => { legDraft.push({line:"JC",car:null,door:null}); drawLegs(); };
+document.getElementById("addOpt").onclick = () => {
+  const used = new Set(optDraft.map(o => o.tag || ""));
+  const next = ["エスカレーター","エレベーター","階段"].find(t => !used.has(t)) || "";
+  optDraft.push({tag:next, legs:[{line:"JC",car:null,door:null}], memo:""});
+  drawOpts();
+};
 
 function openEditor(e){
   editing = e || null;
@@ -859,13 +1002,15 @@ function openEditor(e){
   document.getElementById("f-dir").value  = (e && e.dir) || "go";
   secSel.value = (e && SECTIONS.some(s=>s.id===e.sec)) ? e.sec : (e ? "__other" : "chuo");
 
-  legDraft = (e && e.legs && e.legs.length)
-    ? e.legs.map(l => Object.assign({}, l))
-    : [{line:"JC",car:null,door:null}];
+  optDraft = (e && e.opts && e.opts.length)
+    ? e.opts.map(o => ({tag:o.tag || "", memo:o.memo || "",
+                        legs:(o.legs||[]).map(l => Object.assign({}, l))}))
+    : [{tag:"", legs:[{line:"JC",car:null,door:null}], memo:""}];
+  if(!optDraft[0].legs.length) optDraft[0].legs.push({line:"JC",car:null,door:null});
   tagDraft = new Set((e && e.tags) || []);
   tagPick.querySelectorAll("button").forEach(b =>
     b.setAttribute("aria-pressed", String(tagDraft.has(b.textContent))));
-  drawLegs();
+  drawOpts();
 
   document.getElementById("deleteBtn").hidden = !e;
   dlg.showModal();
@@ -882,10 +1027,13 @@ document.getElementById("saveBtn").onclick = () => {
     memo: document.getElementById("f-memo").value.trim(),
     dir:  document.getElementById("f-dir").value,
     sec:  secSel.value,
-    legs: legDraft.filter(l => l.car || l.pos),
+    opts: optDraft
+            .map(o => ({tag:o.tag || "", memo:o.memo || "",
+                        legs:(o.legs||[]).filter(l => l.car || l.pos)}))
+            .filter(o => o.legs.length),
     tags: Array.from(tagDraft)
   };
-  if(!patch.legs.length && !patch.memo){ toast("号車かメモを入れてください"); return; }
+  if(!patch.opts.length && !patch.memo){ toast("号車かメモを入れてください"); return; }
 
   if(editing){
     if(BASE.some(b => b.id === editing.id)) S.overrides[editing.id] = patch;
