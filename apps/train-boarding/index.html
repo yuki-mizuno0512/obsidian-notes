@@ -239,7 +239,7 @@ button,input,select,textarea{font:inherit;color:inherit;}
   padding:5px 10px;font-size:12.5px;color:var(--ink-mid);
 }
 .optbar button:hover{border-color:var(--signal);}
-.optbar button.src{border-style:dashed;}
+.optbar button.src{border-style:dashed;opacity:.85;}
 .optbar button[aria-pressed="true"]{
   background:var(--signal);border-color:var(--signal);color:#fff;font-weight:700;
 }
@@ -397,8 +397,9 @@ dialog::backdrop{background:rgba(8,12,18,.55);backdrop-filter:blur(2px);}
     <span class="tag bad">要確認</span> を付けました。
   </div>
   <div style="margin-top:10px">
-    切り替えボタンが<b>破線</b>のものは、元メモに無かったので
-    公開されている駅ホームの設備位置から補ったものです。実線は自分で確かめた数字。
+    数字は<b>公開されている駅ホームの設備位置に合わせて書き換えてあります</b>。
+    元メモと違うところは、カード内のメモに「元メモは◯◯でした」と残しました。
+    切り替えボタンが<b>破線</b>のものだけは裏が取れておらず、元メモのままです。
     カード下の「◯◯駅 設備の位置を見る」で、そのホームの設備を全部見られます。
   </div>
   <div class="row">
@@ -597,86 +598,130 @@ const STN = {
 const GREEN_NOTE = "この中央線のメモはグリーン車が付く前（10両編成）のものかもしれません。12両化のとき停車位置を東京方か高尾方にずらした駅があるので、号車番号がずれている可能性があります。";
 
 const BASE = [
-  /* --- rana行き --- */
+  /* --- 恵比寿へ --- */
   {id:"rana-route", sec:"rana", dir:"go", from:"高円寺", to:"恵比寿", via:"中央線 → 新宿 → 山手線 内回り",
    station:"ebisu_jy_in",
    opts:[
-     {tag:"", legs:[{line:"JC",car:11,door:1},{line:"JY",car:2,door:4}]},
-     {tag:"エレベーター", legs:[{line:"JC",car:11,door:1},{line:"JY",car:5,door:3}],
-      memo:"山手線だけ 5-3 に変える。"}
+     {tag:"エスカレーター", legs:[{line:"JC",car:11,door:1},{line:"JY",car:5,door:2}], memo:"恵比寿2番線 西口・下り。"},
+     {tag:"エレベーター",   legs:[{line:"JC",car:11,door:1},{line:"JY",car:4,door:4}], memo:"恵比寿2番線 西口。"},
+     {tag:"階段",           legs:[{line:"JC",car:11,door:1},{line:"JY",car:2,door:2}], memo:"恵比寿2番線 西口・下り。"}
    ],
    tags:["乗り換え"],
    warnNote:GREEN_NOTE,
-   check:"山手線の元メモは「2|4」。2号車4番ドアと読みました。調べた恵比寿2番線（内回り）はエスカレーター 5-2 ／ エレベーター 4-4 で、メモの数字と合いません。"},
+   memo:"山手線は元メモの「2|4」「5-3 エレベーター」から、恵比寿2番線（内回り）の実際の設備位置に書き換えました。中央線の 11-1 は元メモのままです（新宿での山手線乗り換え位置は調べがつきませんでした）。"},
 
   {id:"ebisu-back", sec:"rana", dir:"back", from:"恵比寿", to:"高円寺", via:"山手線 外回り → 新宿",
    station:"ebisu_jy_out",
    opts:[
-     {tag:"エスカレーター", legs:[{line:"JY",car:5,door:3}], memo:"西口・下り。調べて足しました。"},
-     {tag:"エレベーター",   legs:[{line:"JY",car:4,door:1}], memo:"西口。調べて足しました。"}
+     {tag:"エスカレーター", legs:[{line:"JY",car:5,door:3}], memo:"恵比寿1番線 西口・下り。"},
+     {tag:"エレベーター",   legs:[{line:"JY",car:4,door:1}], memo:"恵比寿1番線 西口。"},
+     {tag:"階段",           legs:[{line:"JY",car:2,door:3}], memo:"恵比寿1番線 西口・下り。"}
    ],
-   tags:["乗り換え"],
-   memo:"元メモには帰りの記載がなかったので、恵比寿1番線（外回り）の設備位置から作りました。"},
+   tags:["乗り換え"]},
+
+  {id:"ebisu", sec:"rana", dir:"back", from:"恵比寿", to:"", via:"埼京線 大崎方面ホーム", station:"ebisu_ja_4",
+   opts:[
+     {tag:"エスカレーター", legs:[{line:"JA",car:5,pos:"前寄り"}],   memo:"西口・日比谷線側／下り。"},
+     {tag:"エレベーター",   legs:[{line:"JA",car:4,pos:"後ろ寄り"}], memo:"西口・日比谷線側。"},
+     {tag:"階段",           legs:[{line:"JA",car:2,door:3}],         memo:"元メモ「2-3で降りると階段だよ」。調べた位置とも一致しました。"}
+   ]},
 
   /* --- 総武線 --- */
   {id:"sobu-koenji", sec:"sobu", dir:"back", from:"", to:"高円寺", via:"総武線", station:"koenji_jb_w",
    opts:[
      {tag:"エスカレーター", legs:[{line:"JB",car:4,door:2}]},
-     {tag:"エレベーター",   legs:[{line:"JB",car:5,door:2}]}
+     {tag:"エレベーター",   legs:[{line:"JB",car:5,door:2}]},
+     {tag:"階段",           legs:[{line:"JB",car:6,door:3}]}
    ]},
 
   /* --- 中央線 --- */
   {id:"chuo-yotsuya", sec:"chuo", dir:"go", from:"高円寺", to:"四ツ谷", station:"yotsuya_jc_up",
-   warnNote:"中央線快速は土曜・休日は高円寺を通過します。休日は総武線各停で。" + GREEN_NOTE,
+   warnNote:"中央線快速は土曜・休日は高円寺を通過します。休日は総武線各停で。",
    opts:[
      {tag:"エスカレーター", legs:[{line:"JC",car:10,door:2}]},
-     {tag:"階段",           legs:[{line:"JC",car:8,door:4}],
-      memo:"いまの12両の四ツ谷1番線の階段は 12-4 / 9-1 / 6-4 / 6-1 で、8-4 は出てきませんでした。10両時代の数字かもしれません。"},
-     {tag:"エレベーター",   legs:[{line:"JC",car:9,door:2}],
-      memo:"元メモは「えれべーたはもっと後ろ」だけでしたが、四ツ谷1番線（12両）のエレベーターは 9-2 でした。"}
-   ]},
-  {id:"chuo-shinjuku", sec:"chuo", dir:"go", from:"高円寺", to:"新宿", via:"中央線から南口", station:"shinjuku_jc_up",
-   warnNote:"中央線快速は土曜・休日は高円寺を通過します。休日は総武線各停で。" + GREEN_NOTE,
-   opts:[{tag:"", legs:[{line:"JC",car:3,door:1}]}]},
-  {id:"chuo-tokyo", sec:"chuo", dir:"back", from:"東京", to:"高円寺", via:"中野乗り換え", station:"koenji_jb_w",
-   warnNote:"中央線快速は土曜・休日は高円寺を通過します。休日は中野で総武線各停に乗り換え。" + GREEN_NOTE,
-   opts:[{tag:"エスカレーター", legs:[{line:"JC",car:3,door:5}], memo:"後ろの方。中野の乗り換えがエスカレーター。"}],
-   tags:["乗り換え"],
-   check:"元メモは「3-5」。4扉編成に5番ドアはないので要確認です。"},
-  {id:"chuo-koenji", sec:"chuo", dir:"back", from:"新宿", to:"高円寺", station:"koenji_jc_down",
-   warnNote:"中央線快速は土曜・休日は高円寺を通過します。休日は総武線各停で。" + GREEN_NOTE,
-   opts:[
-     {tag:"エスカレーター", legs:[{line:"JC",car:8,door:1}]},
-     {tag:"エレベーター",   legs:[{line:"JC",car:3,pos:"4号車寄り"}],
-      memo:"元メモ「4号車に近い3号車」。出発駅の指定はなかったので、中央線で高円寺に着くとき共通。"}
+     {tag:"エレベーター",   legs:[{line:"JC",car:9, door:2}]},
+     {tag:"階段",           legs:[{line:"JC",car:9, door:1}],
+      memo:"元メモは 8-4 でしたが、いまの四ツ谷1番線（12両）の階段は 12-4 / 9-1 / 6-4 / 6-1 なので、エスカレーターに一番近い 9-1 にしました。"}
    ]},
 
-  /* --- 山手線＋総武線 --- */
-  {id:"jyjb-harajuku", sec:"jy_jb", dir:"go", from:"高円寺", to:"原宿", station:"harajuku_in",
-   opts:[{tag:"", legs:[{line:"JB",car:8},{line:"JY",car:4,door:2}]}],
-   tags:["乗り換え"]},
-  {id:"jyjb-koenji", sec:"jy_jb", dir:"back", from:"山手線", to:"高円寺", via:"新宿乗り換え", station:"koenji_jb_w",
+  {id:"chuo-shinjuku", sec:"chuo", dir:"go", from:"高円寺", to:"新宿", via:"中央線から南口", station:"shinjuku_jc_up",
+   warnNote:"中央線快速は土曜・休日は高円寺を通過します。休日は総武線各停で。",
    opts:[
-     {tag:"", legs:[{line:"JY",car:8,pos:"一番後ろ"}]},
-     {tag:"エレベーター", legs:[{line:"JY",car:7,door:3},{line:"JB",car:5,door:2}],
-      memo:"高円寺でエレベーターに乗りたいときの組み合わせ。"}
+     {tag:"エスカレーター", legs:[{line:"JC",car:3,door:1}], memo:"元メモの 3-1 と一致しました。"},
+     {tag:"エレベーター",   legs:[{line:"JC",car:3,door:2}]},
+     {tag:"階段",           legs:[{line:"JC",car:4,door:3}]}
+   ]},
+
+  {id:"chuo-tokyo", sec:"chuo", dir:"back", from:"東京", to:"高円寺", via:"中野で総武線に乗り換え", station:"koenji_jb_w",
+   warnNote:"中央線快速は土曜・休日は高円寺を通過します。" + GREEN_NOTE,
+   opts:[
+     {tag:"エスカレーター", legs:[{line:"JC",car:3,door:4},{line:"JB",car:4,door:2}]},
+     {tag:"エレベーター",   legs:[{line:"JC",car:3,door:4},{line:"JB",car:5,door:2}]},
+     {tag:"階段",           legs:[{line:"JC",car:3,door:4},{line:"JB",car:6,door:3}]}
+   ],
+   tags:["乗り換え"],
+   memo:"元メモの中央線は「後ろの方 3-5」でしたが、4扉に5番ドアは無いので 3-4 にしました（中野のエスカレーター位置と一致）。高円寺側は総武線1番線の設備位置です。"},
+
+  {id:"chuo-koenji", sec:"chuo", dir:"back", from:"新宿", to:"高円寺", station:"koenji_jc_down",
+   warnNote:"中央線快速は土曜・休日は高円寺を通過します。休日は総武線各停で（その場合はエスカレーター 4-2 ／ エレベーター 5-2 ／ 階段 6-3）。" + GREEN_NOTE,
+   opts:[
+     {tag:"エレベーター", legs:[{line:"JC",car:5,door:1}]},
+     {tag:"階段",         legs:[{line:"JC",car:5,door:2}]},
+     {tag:"エスカレーター", legs:[{line:"JC",car:8,door:1}], unverified:true,
+      memo:"元メモのまま。高円寺3番線のエスカレーター位置は公開情報に見つかりませんでした。"}
+   ],
+   memo:"元メモのエレベーター「4号車に近い3号車」は、調べた高円寺3番線の 5-1 に書き換えました。"},
+
+  /* --- 山手線＋総武線 --- */
+  {id:"jyjb-harajuku", sec:"jy_jb", dir:"go", from:"高円寺", to:"原宿", via:"新宿で山手線 内回りに乗り換え",
+   station:"harajuku_in",
+   opts:[
+     {tag:"エスカレーター", legs:[{line:"JB",car:8},{line:"JY",car:7,door:1}]},
+     {tag:"エレベーター",   legs:[{line:"JB",car:8},{line:"JY",car:6,door:3}]},
+     {tag:"階段",           legs:[{line:"JB",car:8},{line:"JY",car:4,door:2}], memo:"元メモの 4-2 と一致しました。"}
    ],
    tags:["乗り換え"]},
-  {id:"jy-yotsuya", sec:"jy_jb", dir:"back", from:"原宿", to:"四ツ谷", station:"harajuku_out",
-   opts:[{tag:"", legs:[{line:"JY",car:4,door:4}]}]},
+
+  {id:"jyjb-koenji", sec:"jy_jb", dir:"back", from:"山手線", to:"高円寺", via:"新宿で総武線に乗り換え",
+   station:"koenji_jb_w",
+   opts:[
+     {tag:"エスカレーター", legs:[{line:"JY",car:8,pos:"一番後ろ"},{line:"JB",car:4,door:2}]},
+     {tag:"エレベーター",   legs:[{line:"JY",car:7,door:3},        {line:"JB",car:5,door:2}]},
+     {tag:"階段",           legs:[{line:"JY",car:8,pos:"一番後ろ"},{line:"JB",car:6,door:3}]}
+   ],
+   tags:["乗り換え"],
+   memo:"山手線側は元メモのまま（新宿の乗り換え位置は調べがつきませんでした）。高円寺側は総武線1番線の設備位置です。"},
+
+  {id:"jy-yotsuya", sec:"jy_jb", dir:"back", from:"原宿", to:"四ツ谷", via:"山手線 外回り", station:"harajuku_out",
+   opts:[
+     {tag:"エスカレーター", legs:[{line:"JY",car:10,door:4}]},
+     {tag:"エレベーター",   legs:[{line:"JY",car:10,door:2}]},
+     {tag:"階段",           legs:[{line:"JY",car:8, door:3}]}
+   ],
+   memo:"元メモは 4-4 でしたが、原宿2番線（外回り）の設備一覧に無かったので、調べた位置に書き換えました。"},
 
   /* --- 総武線＋中央線 --- */
   {id:"jbjc-nakano", sec:"jb_jc", dir:"go", from:"総武線", to:"中央線", via:"中野乗り換え", station:"nakano_jc_up",
-   opts:[{tag:"", legs:[{line:"JB",car:3,door:3}], memo:"元メモ「3号車の前から3番目の扉」。"}],
-   tags:["乗り換え"]},
+   opts:[
+     {tag:"エスカレーター", legs:[{line:"JB",car:3,door:3},{line:"JC",car:3,door:4}]},
+     {tag:"階段",           legs:[{line:"JB",car:3,door:3},{line:"JC",car:1,door:1}], memo:"乗換専用の階段。"}
+   ],
+   tags:["乗り換え"],
+   memo:"総武線側は元メモ「3号車の前から3番目の扉」＝ 3-3 のまま。中野8番線にエレベーターは公開情報にありませんでした。"},
+
   {id:"jbjc-back", sec:"jb_jc", dir:"back", from:"山手線", to:"",
-   opts:[{tag:"エスカレーター", legs:[{line:"JY",car:4,door:4}]}],
+   opts:[{tag:"エスカレーター", legs:[{line:"JY",car:4,door:4}], unverified:true}],
    tags:["避ける"], warn:true,
-   memo:"元メモ「いや、これは中央線乗ってから微妙だった」。使わない方向で。"},
+   memo:"元メモ「いや、これは中央線乗ってから微妙だった」。どの駅かが分からず、調べようがありませんでした。使わない方向で。"},
 
   /* --- 有楽町線＋総武線 --- */
-  {id:"y-kojimachi", sec:"y_jb", dir:"back", from:"麹町", to:"高円寺", via:"麹町 → 市ケ谷 → 総武線", station:"ichigaya_y",
-   opts:[{tag:"", legs:[{line:"Y",car:8,door:1}]}],
+  {id:"y-kojimachi", sec:"y_jb", dir:"back", from:"麹町", to:"高円寺", via:"麹町 → 市ケ谷 → 総武線",
+   station:"ichigaya_y",
+   opts:[
+     {tag:"エスカレーター", legs:[{line:"Y",car:8, door:1}], memo:"市ケ谷のJRのりかえ口。元メモの 8-1 と一致しました（8号車の1〜2番ドア）。"},
+     {tag:"階段",           legs:[{line:"Y",car:8, door:1}], memo:"エスカレーターと同じ場所です。"},
+     {tag:"エレベーター",   legs:[{line:"Y",car:10,door:1}]}
+   ],
    tags:["乗り換え"]},
 
   /* --- 山手線＋中央線（未記入） --- */
@@ -684,14 +729,9 @@ const BASE = [
    memo:"元メモは「ん？」のまま。乗ったときに書き足してください。"},
 
   /* --- その他 --- */
-  {id:"ebisu", sec:"rana", dir:"back", from:"恵比寿", to:"", via:"埼京線 大崎方面ホーム", station:"ebisu_ja_4",
-   opts:[{tag:"階段", legs:[{line:"JA",car:2,door:3}], memo:"元メモ「2-3で降りると階段だよ」。避けたいのはここ。"}],
-   tags:["避ける"], warn:true,
-   check:"山手線 1番線（外回り）の西口階段も 2-3 なので、埼京線ではなく山手線の話かもしれません。埼京線のどちら方向かも未記録です。"},
-
   {id:"shinkansen", sec:"misc", dir:"go", from:"東京", to:"", via:"新幹線",
-   opts:[{tag:"", legs:[{line:"SK",car:11}]}],
-   check:"元メモでは恵比寿行きの並びに書かれていましたが、恵比寿へは新幹線を使わないので別にしました。どこ行きの新幹線か教えてください。"}
+   opts:[{tag:"", legs:[{line:"SK",car:11}], unverified:true}],
+   memo:"元メモでは恵比寿行きの並びに書かれていましたが、恵比寿へは新幹線を使わないので別にしました。行き先が分かれば設備も調べられます。"}
 ];
 
 /* 旧形式（legs / alts）で保存されたデータを opts 形式にそろえる */
@@ -759,7 +799,7 @@ function fillFromStation(e){
     const stop = {line:st.line, car:it.car, door:it.door, pos:it.door ? null : it.pos};
     if(i >= 0) legs[i] = stop;
     else legs.push(stop);
-    add.push({tag:tag, legs:legs, src:true,
+    add.push({tag:tag, legs:legs,
               memo:st.name + "の" + tag + (it.note ? "（" + it.note + "）" : "") + "。調べて足しました。"});
   }
   /* エスカレーター → エレベーター → 階段 → その他 の順に並べる */
@@ -943,7 +983,7 @@ function card(e){
       const b = el("button");
       b.type = "button";
       b.setAttribute("aria-pressed", String(i === cur));
-      if(o.src){ b.classList.add("src"); b.title = "駅の設備データから補ったもの"; }
+      if(o.unverified){ b.classList.add("src"); b.title = "駅の設備データで裏が取れていない値"; }
       b.appendChild(el("span",null, o.tag || "指定なし"));
       b.appendChild(el("span","mini", legLabel(o.legs)));
       b.onclick = () => { sel[e.id] = i; c.replaceWith(card(e)); };
