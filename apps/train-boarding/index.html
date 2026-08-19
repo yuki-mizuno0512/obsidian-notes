@@ -239,6 +239,7 @@ button,input,select,textarea{font:inherit;color:inherit;}
   padding:5px 10px;font-size:12.5px;color:var(--ink-mid);
 }
 .optbar button:hover{border-color:var(--signal);}
+.optbar button.src{border-style:dashed;}
 .optbar button[aria-pressed="true"]{
   background:var(--signal);border-color:var(--signal);color:#fff;font-weight:700;
 }
@@ -395,6 +396,11 @@ dialog::backdrop{background:rgba(8,12,18,.55);backdrop-filter:blur(2px);}
     元メモそのままの表記は残してあります。数が編成と合わないものには
     <span class="tag bad">要確認</span> を付けました。
   </div>
+  <div style="margin-top:10px">
+    切り替えボタンが<b>破線</b>のものは、元メモに無かったので
+    公開されている駅ホームの設備位置から補ったものです。実線は自分で確かめた数字。
+    カード下の「◯◯駅 設備の位置を見る」で、そのホームの設備を全部見られます。
+  </div>
   <div class="row">
     <button id="expBtn">追加分を書き出す</button>
     <button id="impBtn">読み込む</button>
@@ -463,12 +469,11 @@ const LINES = {
       head:"外回りは1号車が先頭／内回りは11号車が先頭"},
   JA:{name:"埼京線",       mark:"JA", color:"#00B48D", fg:"#fff",    cars:10, doors:4},
   Y :{name:"有楽町線",     mark:"Y",  color:"#B58F3E", fg:"#fff",    cars:10, doors:4},
-  TX:{name:"つくばエクスプレス", mark:"TX", color:"#0B6CB5", fg:"#fff", cars:6, doors:4},
   SK:{name:"新幹線",       mark:"新", color:"#0F4C8A", fg:"#fff",    cars:16, doors:2}
 };
 
 const SECTIONS = [
-  {id:"rana",  title:"rana行き"},
+  {id:"rana",  title:"恵比寿へ"},
   {id:"sobu",  title:"総武線"},
   {id:"chuo",  title:"中央線"},
   {id:"jy_jb", title:"山手線 ＋ 総武線"},
@@ -506,7 +511,7 @@ const STN = {
       {tag:"階段",           car:6,  door:4},
       {tag:"階段",           car:6,  door:1}
     ],
-    caveat:"10両時代の数字か12両の数字か、出典から確定できませんでした。"},
+    caveat:"12号車が出てくるので、これは12両編成（グリーン車あり）のいまの数字です。"},
   harajuku_in:{
     name:"原宿 1番線", sub:"山手線 内回り（渋谷・品川方面）＝新宿から来て降りるホーム", line:"JY",
     items:[
@@ -527,14 +532,52 @@ const STN = {
       {tag:"階段",           car:8,  door:3},
       {tag:"階段",           car:5,  door:2}
     ]},
-  ebisu_ja:{
-    name:"恵比寿 3番線", sub:"埼京線 下り 新宿・大宮方面", line:"JA",
+  ebisu_jy_in:{
+    name:"恵比寿 2番線", sub:"山手線 内回り（＝新宿から来て降りるホーム）", line:"JY",
     items:[
-      {tag:"エスカレーター", car:5, door:3, note:"西口・日比谷線"},
-      {tag:"エレベーター",   car:4, door:3, note:"西口・日比谷線"},
-      {tag:"階段",           car:2, door:3, note:"西口・日比谷線"},
-      {tag:"エスカレーター", car:6, door:3, note:"東口・ガーデンプレイス"},
-      {tag:"階段",           car:9, door:2, note:"東口・ガーデンプレイス"}
+      {tag:"エスカレーター", car:5, door:2, note:"西口・下り"},
+      {tag:"エレベーター",   car:4, door:4, note:"西口"},
+      {tag:"階段",           car:2, door:2, note:"西口・下り"},
+      {tag:"エスカレーター", car:6, door:2, note:"東口・ガーデンプレイス・上り"},
+      {tag:"階段",           car:9, door:3, note:"東口・ガーデンプレイス・上り"}
+    ]},
+  ebisu_jy_out:{
+    name:"恵比寿 1番線", sub:"山手線 外回り（＝恵比寿から新宿へ帰るホーム）", line:"JY",
+    items:[
+      {tag:"エスカレーター", car:5, door:3, note:"西口・下り"},
+      {tag:"エレベーター",   car:4, door:1, note:"西口"},
+      {tag:"階段",           car:2, door:3, note:"西口・下り"},
+      {tag:"エスカレーター", car:6, door:3, note:"東口・ガーデンプレイス・上り"},
+      {tag:"階段",           car:9, door:2, note:"東口・ガーデンプレイス・上り"}
+    ]},
+  ebisu_ja_4:{
+    name:"恵比寿 4番線", sub:"埼京線 大崎・新木場方面（＝新宿から来て降りるホーム）", line:"JA",
+    items:[
+      {tag:"エスカレーター", car:5, pos:"前寄り",   note:"西口・日比谷線／下り"},
+      {tag:"エレベーター",   car:4, pos:"後ろ寄り", note:"西口・日比谷線"},
+      {tag:"階段",           car:2, door:3,        note:"西口・日比谷線／下り"},
+      {tag:"エスカレーター", car:6, pos:"付近",     note:"東口・ガーデンプレイス"},
+      {tag:"階段",           car:9, pos:"付近",     note:"東口・ガーデンプレイス"}
+    ],
+    caveat:"出典ではドア番号まで書かれていないものがあり、号車と前後だけ載せています。"},
+  shinjuku_jc_up:{
+    name:"新宿 7・8番線", sub:"中央線快速 上り 御茶ノ水・東京方面（南口・東南口へ）", line:"JC",
+    items:[
+      {tag:"エスカレーター", car:3, door:1, note:"南口・東南口"},
+      {tag:"エレベーター",   car:3, door:2, note:"南口・東南口"},
+      {tag:"階段",           car:4, door:3, note:"南口・東南口"},
+      {tag:"エスカレーター", car:5, door:3, note:"中央東口・西口"},
+      {tag:"エレベーター",   car:7, door:1, note:"中央東口・西口"},
+      {tag:"階段",           car:8, door:4, note:"中央東口・西口"}
+    ],
+    caveat:"10両時代の数字の可能性があります。"},
+  ichigaya_y:{
+    name:"市ケ谷 有楽町線", sub:"JR中央・総武線への乗り換え口へ", line:"Y",
+    items:[
+      {tag:"エスカレーター", car:8,  door:2, note:"JRのりかえ口"},
+      {tag:"階段",           car:8,  door:2, note:"JRのりかえ口"},
+      {tag:"エレベーター",   car:10, door:1},
+      {tag:"エレベーター",   car:1,  door:1}
     ]},
   nakano_jc_up:{
     name:"中野 8番線", sub:"中央線快速 上り 新宿・東京方面", line:"JC",
@@ -551,23 +594,29 @@ const STN = {
    opts に「エスカレーター / エレベーター / 階段」ごとののりばを並べて、
    カードの中で切り替えられるようにしている。
    leg: {line, car, door, pos}   pos は「一番後ろ」など号車内の言い回し   */
+const GREEN_NOTE = "この中央線のメモはグリーン車が付く前（10両編成）のものかもしれません。12両化のとき停車位置を東京方か高尾方にずらした駅があるので、号車番号がずれている可能性があります。";
+
 const BASE = [
   /* --- rana行き --- */
-  {id:"rana-route", sec:"rana", dir:"go", from:"高円寺", to:"rana", via:"中央線 → 山手線 → 新幹線",
+  {id:"rana-route", sec:"rana", dir:"go", from:"高円寺", to:"恵比寿", via:"中央線 → 新宿 → 山手線 内回り",
+   station:"ebisu_jy_in",
    opts:[
-     {tag:"", legs:[{line:"JC",car:11,door:1},{line:"JY",car:2,door:4},{line:"SK",car:11}]},
-     {tag:"エレベーター", legs:[{line:"JC",car:11,door:1},{line:"JY",car:5,door:3},{line:"SK",car:11}],
+     {tag:"", legs:[{line:"JC",car:11,door:1},{line:"JY",car:2,door:4}]},
+     {tag:"エレベーター", legs:[{line:"JC",car:11,door:1},{line:"JY",car:5,door:3}],
       memo:"山手線だけ 5-3 に変える。"}
    ],
-   check:"山手線の元メモは「2|4」。2号車4番ドアと読みました。"},
+   tags:["乗り換え"],
+   warnNote:GREEN_NOTE,
+   check:"山手線の元メモは「2|4」。2号車4番ドアと読みました。調べた恵比寿2番線（内回り）はエスカレーター 5-2 ／ エレベーター 4-4 で、メモの数字と合いません。"},
 
-  {id:"rana-tx", sec:"rana", dir:"go", from:"TX", to:"東京駅乗り換え",
+  {id:"ebisu-back", sec:"rana", dir:"back", from:"恵比寿", to:"高円寺", via:"山手線 外回り → 新宿",
+   station:"ebisu_jy_out",
    opts:[
-     {tag:"", legs:[{line:"TX",car:8,door:4}]},
-     {tag:"別案", legs:[{line:"TX",car:9,door:1}]}
+     {tag:"エスカレーター", legs:[{line:"JY",car:5,door:3}], memo:"西口・下り。調べて足しました。"},
+     {tag:"エレベーター",   legs:[{line:"JY",car:4,door:1}], memo:"西口。調べて足しました。"}
    ],
    tags:["乗り換え"],
-   check:"元メモは「TX／東京駅乗り換え／8-4・9-1」。TXは6両編成で東京駅に乗り入れていないため、路線名の解釈が要確認です。"},
+   memo:"元メモには帰りの記載がなかったので、恵比寿1番線（外回り）の設備位置から作りました。"},
 
   /* --- 総武線 --- */
   {id:"sobu-koenji", sec:"sobu", dir:"back", from:"", to:"高円寺", via:"総武線", station:"koenji_jb_w",
@@ -578,23 +627,24 @@ const BASE = [
 
   /* --- 中央線 --- */
   {id:"chuo-yotsuya", sec:"chuo", dir:"go", from:"高円寺", to:"四ツ谷", station:"yotsuya_jc_up",
-   warnNote:"中央線快速は土曜・休日は高円寺を通過します。休日は総武線各停で。",
+   warnNote:"中央線快速は土曜・休日は高円寺を通過します。休日は総武線各停で。" + GREEN_NOTE,
    opts:[
      {tag:"エスカレーター", legs:[{line:"JC",car:10,door:2}]},
-     {tag:"階段",           legs:[{line:"JC",car:8,door:4}]},
-     {tag:"エレベーター",   legs:[{line:"JC",pos:"もっと後ろ"}],
-      memo:"元メモは「えれべーたはもっと後ろ」だけ。号車は未記録。"}
+     {tag:"階段",           legs:[{line:"JC",car:8,door:4}],
+      memo:"いまの12両の四ツ谷1番線の階段は 12-4 / 9-1 / 6-4 / 6-1 で、8-4 は出てきませんでした。10両時代の数字かもしれません。"},
+     {tag:"エレベーター",   legs:[{line:"JC",car:9,door:2}],
+      memo:"元メモは「えれべーたはもっと後ろ」だけでしたが、四ツ谷1番線（12両）のエレベーターは 9-2 でした。"}
    ]},
-  {id:"chuo-shinjuku", sec:"chuo", dir:"go", from:"高円寺", to:"新宿", via:"中央線から南口",
-   warnNote:"中央線快速は土曜・休日は高円寺を通過します。休日は総武線各停で。",
+  {id:"chuo-shinjuku", sec:"chuo", dir:"go", from:"高円寺", to:"新宿", via:"中央線から南口", station:"shinjuku_jc_up",
+   warnNote:"中央線快速は土曜・休日は高円寺を通過します。休日は総武線各停で。" + GREEN_NOTE,
    opts:[{tag:"", legs:[{line:"JC",car:3,door:1}]}]},
-  {id:"chuo-tokyo", sec:"chuo", dir:"back", from:"東京", to:"高円寺", via:"中野乗り換え",
-   warnNote:"中央線快速は土曜・休日は高円寺を通過します。休日は中野で総武線各停に乗り換え。",
+  {id:"chuo-tokyo", sec:"chuo", dir:"back", from:"東京", to:"高円寺", via:"中野乗り換え", station:"koenji_jb_w",
+   warnNote:"中央線快速は土曜・休日は高円寺を通過します。休日は中野で総武線各停に乗り換え。" + GREEN_NOTE,
    opts:[{tag:"エスカレーター", legs:[{line:"JC",car:3,door:5}], memo:"後ろの方。中野の乗り換えがエスカレーター。"}],
    tags:["乗り換え"],
    check:"元メモは「3-5」。4扉編成に5番ドアはないので要確認です。"},
   {id:"chuo-koenji", sec:"chuo", dir:"back", from:"新宿", to:"高円寺", station:"koenji_jc_down",
-   warnNote:"中央線快速は土曜・休日は高円寺を通過します。休日は総武線各停で。",
+   warnNote:"中央線快速は土曜・休日は高円寺を通過します。休日は総武線各停で。" + GREEN_NOTE,
    opts:[
      {tag:"エスカレーター", legs:[{line:"JC",car:8,door:1}]},
      {tag:"エレベーター",   legs:[{line:"JC",car:3,pos:"4号車寄り"}],
@@ -605,7 +655,7 @@ const BASE = [
   {id:"jyjb-harajuku", sec:"jy_jb", dir:"go", from:"高円寺", to:"原宿", station:"harajuku_in",
    opts:[{tag:"", legs:[{line:"JB",car:8},{line:"JY",car:4,door:2}]}],
    tags:["乗り換え"]},
-  {id:"jyjb-koenji", sec:"jy_jb", dir:"back", from:"山手線", to:"高円寺", via:"新宿乗り換え",
+  {id:"jyjb-koenji", sec:"jy_jb", dir:"back", from:"山手線", to:"高円寺", via:"新宿乗り換え", station:"koenji_jb_w",
    opts:[
      {tag:"", legs:[{line:"JY",car:8,pos:"一番後ろ"}]},
      {tag:"エレベーター", legs:[{line:"JY",car:7,door:3},{line:"JB",car:5,door:2}],
@@ -625,7 +675,7 @@ const BASE = [
    memo:"元メモ「いや、これは中央線乗ってから微妙だった」。使わない方向で。"},
 
   /* --- 有楽町線＋総武線 --- */
-  {id:"y-kojimachi", sec:"y_jb", dir:"back", from:"麹町", to:"高円寺", via:"麹町 → 市ケ谷",
+  {id:"y-kojimachi", sec:"y_jb", dir:"back", from:"麹町", to:"高円寺", via:"麹町 → 市ケ谷 → 総武線", station:"ichigaya_y",
    opts:[{tag:"", legs:[{line:"Y",car:8,door:1}]}],
    tags:["乗り換え"]},
 
@@ -634,14 +684,14 @@ const BASE = [
    memo:"元メモは「ん？」のまま。乗ったときに書き足してください。"},
 
   /* --- その他 --- */
-  {id:"ebisu", sec:"misc", dir:"none", from:"恵比寿", to:"", via:"埼京線", station:"ebisu_ja",
-   opts:[
-     {tag:"エスカレーター", legs:[{line:"JA",car:5,door:3}], memo:"西口・日比谷線側。調べて足しました。"},
-     {tag:"エレベーター",   legs:[{line:"JA",car:4,door:3}], memo:"西口・日比谷線側。調べて足しました。"},
-     {tag:"階段",           legs:[{line:"JA",car:2,door:3}], memo:"元メモ「2-3で降りると階段だよ」。避けたいのはここ。"}
-   ],
-   tags:["避ける"],
-   memo:"元メモは階段の位置だけだったので、同じホームのエスカレーター・エレベーターを調べて足しました。"}
+  {id:"ebisu", sec:"rana", dir:"back", from:"恵比寿", to:"", via:"埼京線 大崎方面ホーム", station:"ebisu_ja_4",
+   opts:[{tag:"階段", legs:[{line:"JA",car:2,door:3}], memo:"元メモ「2-3で降りると階段だよ」。避けたいのはここ。"}],
+   tags:["避ける"], warn:true,
+   check:"山手線 1番線（外回り）の西口階段も 2-3 なので、埼京線ではなく山手線の話かもしれません。埼京線のどちら方向かも未記録です。"},
+
+  {id:"shinkansen", sec:"misc", dir:"go", from:"東京", to:"", via:"新幹線",
+   opts:[{tag:"", legs:[{line:"SK",car:11}]}],
+   check:"元メモでは恵比寿行きの並びに書かれていましたが、恵比寿へは新幹線を使わないので別にしました。どこ行きの新幹線か教えてください。"}
 ];
 
 /* 旧形式（legs / alts）で保存されたデータを opts 形式にそろえる */
@@ -675,9 +725,50 @@ function entries(){
   const out = [];
   for(const b of BASE){
     if(S.hidden.includes(b.id)) continue;
-    out.push(normalize(S.overrides[b.id] ? Object.assign({}, b, S.overrides[b.id]) : b));
+    out.push(fillFromStation(normalize(S.overrides[b.id] ? Object.assign({}, b, S.overrides[b.id]) : b)));
   }
-  return out.concat(S.custom.map(normalize));
+  return out.concat(S.custom.map(e => fillFromStation(normalize(e))));
+}
+
+/* エスカレーター・エレベーター・階段の3つが必ず並ぶように、
+   メモに無いものは駅の設備データから補う（補った分は破線の枠で区別する） */
+const CORE_TAGS = ["エスカレーター","エレベーター","階段"];
+
+function sortOpts(e){
+  if(!e.opts || e.opts.length < 2) return e;
+  const all = e.opts.slice();
+  all.sort((a,b) => {
+    const ia = CORE_TAGS.indexOf(a.tag), ib = CORE_TAGS.indexOf(b.tag);
+    return (ia<0?99:ia) - (ib<0?99:ib);
+  });
+  return Object.assign({}, e, {opts:all});
+}
+
+function fillFromStation(e){
+  const st = STN[e.station];
+  if(!st || e.stub) return sortOpts(e);
+  const have = new Set((e.opts||[]).map(o => o.tag).filter(Boolean));
+  const add = [];
+  for(const tag of CORE_TAGS){
+    if(have.has(tag)) continue;
+    const it = st.items.find(x => x.tag === tag);
+    if(!it) continue;
+    const base = (e.opts && e.opts[0] && e.opts[0].legs) ? e.opts[0].legs : [];
+    let legs = base.map(l => Object.assign({}, l));
+    const i = legs.map(l => l.line).lastIndexOf(st.line);
+    const stop = {line:st.line, car:it.car, door:it.door, pos:it.door ? null : it.pos};
+    if(i >= 0) legs[i] = stop;
+    else legs.push(stop);
+    add.push({tag:tag, legs:legs, src:true,
+              memo:st.name + "の" + tag + (it.note ? "（" + it.note + "）" : "") + "。調べて足しました。"});
+  }
+  /* エスカレーター → エレベーター → 階段 → その他 の順に並べる */
+  const all = (e.opts||[]).concat(add);
+  all.sort((a,b) => {
+    const ia = CORE_TAGS.indexOf(a.tag), ib = CORE_TAGS.indexOf(b.tag);
+    return (ia<0?99:ia) - (ib<0?99:ib);
+  });
+  return Object.assign({}, e, {opts:all});
 }
 
 function searchText(e){
@@ -852,6 +943,7 @@ function card(e){
       const b = el("button");
       b.type = "button";
       b.setAttribute("aria-pressed", String(i === cur));
+      if(o.src){ b.classList.add("src"); b.title = "駅の設備データから補ったもの"; }
       b.appendChild(el("span",null, o.tag || "指定なし"));
       b.appendChild(el("span","mini", legLabel(o.legs)));
       b.onclick = () => { sel[e.id] = i; c.replaceWith(card(e)); };
@@ -912,7 +1004,8 @@ function stationBlock(st){
     const r = el("div","stn-row");
     const cls = (it.tag==="エスカレーター"||it.tag==="エレベーター") ? "tag good" : "tag";
     r.appendChild(el("span",cls,it.tag));
-    r.appendChild(el("span","stn-pos", it.car + "-" + it.door));
+    r.appendChild(el("span","stn-pos", it.door ? (it.car + "-" + it.door) : (it.car + "号車")));
+    if(!it.door && it.pos) r.appendChild(el("span","stn-note", it.pos));
     if(it.note) r.appendChild(el("span","stn-note", it.note));
     tbl.appendChild(r);
   }
@@ -924,11 +1017,10 @@ function stationBlock(st){
 
 /* 「10-2」「8号車」「3号車ほか」など、チップに出す短い位置表記 */
 function legLabel(legs){
-  const l = (legs||[]).find(x => x.car || x.pos);
-  if(!l) return "";
-  let s = l.car ? (l.door ? l.car + "-" + l.door : l.car + "号車") : l.pos;
-  if((legs||[]).length > 1) s += " ほか";
-  return s;
+  const list = (legs||[]).filter(x => x.car || x.pos);
+  if(!list.length) return "";
+  const l = list[list.length - 1];          // 降りるときの位置
+  return l.car ? (l.door ? l.car + "-" + l.door : l.car + "号車") : l.pos;
 }
 
 function render(){
