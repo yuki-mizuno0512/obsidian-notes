@@ -264,8 +264,6 @@ button,input,select,textarea{font:inherit;color:inherit;}
 .stn summary::after{content:"＋";margin-left:auto;color:var(--ink-dim);font-weight:700;}
 .stn[open] summary::after{content:"−";}
 .stn-sub{font-weight:500;font-size:11.5px;color:var(--ink-dim);}
-.stn-era{font-size:11px;font-weight:700;color:var(--signal);padding:0 10px 7px;letter-spacing:.02em;}
-.stn-era.old{color:var(--warn);}
 .stn-where{font-size:11.5px;color:var(--ink-dim);padding:0 10px 7px;}
 .stn-rows{display:flex;flex-direction:column;gap:5px;padding:0 10px 9px;}
 .stn-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-mid);}
@@ -403,7 +401,7 @@ dialog::backdrop{background:rgba(8,12,18,.55);backdrop-filter:blur(2px);}
     数字は<b>公開されている駅ホームの設備位置に合わせて書き換えてあります</b>。
     元メモと違うところは、カード内のメモに「元メモは◯◯でした」と残しました。
     切り替えボタンが<b>破線</b>のものは要注意 —
-    元メモのままで裏が取れていないか、出典が<b>グリーン車が付く前（10両編成）</b>の数字です。
+    元メモに無く、調べて足しただけの値です（裏が取れていません）。
     カード下の「◯◯駅 設備の位置を見る」で、そのホームの設備を全部見られます。
   </div>
   <div class="row">
@@ -508,9 +506,7 @@ const STN = {
       {tag:"階段",           car:9,  door:1},
       {tag:"階段",           car:6,  door:4},
       {tag:"階段",           car:6,  door:1}
-    ],
-    era:"12両（グリーン車あり）",
-    caveat:"12号車が出てくるので、これはグリーン車が付いたあとの、いまの数字です。"},
+    ]},
   harajuku_in:{
     name:"原宿 1番線", sub:"山手線 内回り（渋谷・品川方面）＝新宿から来て降りるホーム", line:"JY",
     items:[
@@ -568,9 +564,7 @@ const STN = {
       {tag:"エスカレーター", car:5, door:3, note:"中央東口・西口"},
       {tag:"エレベーター",   car:7, door:1, note:"中央東口・西口"},
       {tag:"階段",           car:8, door:4, note:"中央東口・西口"}
-    ],
-    era:"10両（グリーン車なし）時代",
-    caveat:"グリーン車が付く前の数字です。とくに南口の階段「4-3」は、いまは4号車がグリーン車（2扉）なので成立しません。エスカレーター 3-1 とエレベーター 3-2 は1〜3号車なので号車番号自体は変わっていませんが、駅によっては停車位置がずれています。"},
+    ]},
   ichigaya_y:{
     name:"市ケ谷 有楽町線", sub:"JR中央・総武線への乗り換え口へ", line:"Y",
     items:[
@@ -586,8 +580,7 @@ const STN = {
       {tag:"階段",           car:1, door:1, note:"乗換専用"},
       {tag:"階段",           car:6, door:1}
     ],
-    era:"10両（グリーン車なし）時代",
-    caveat:"グリーン車が付く前の数字です。中野は発着ホームが変わることもあります。"}
+    caveat:"中野は発着ホームが変わることもあります。"}
 };
 
 /* ================= 元メモから起こしたデータ =================
@@ -595,8 +588,6 @@ const STN = {
    opts に「エスカレーター / エレベーター / 階段」ごとののりばを並べて、
    カードの中で切り替えられるようにしている。
    leg: {line, car, door, pos}   pos は「一番後ろ」など号車内の言い回し   */
-const GREEN_NOTE = "この中央線のメモはグリーン車が付く前（10両編成）のものかもしれません。12両化のとき停車位置を東京方か高尾方にずらした駅があるので、号車番号がずれている可能性があります。";
-
 const BASE = [
   /* --- 恵比寿へ --- */
   {id:"rana-route", sec:"rana", dir:"go", from:"高円寺", to:"恵比寿", via:"中央線 → 新宿 → 山手線",
@@ -609,7 +600,7 @@ const BASE = [
       ref:"恵比寿2番線（内回り）のエレベーターは 4-4、エスカレーターは 5-2 との情報あり（未検証）"}
    ],
    tags:["乗り換え"],
-   memo:"元メモの「2|4」は 2号車4番ドアと読みました。中央線は10両編成だった頃のメモかもしれません。"},
+   memo:"元メモの「2|4」は 2号車4番ドアと読みました。"},
 
   {id:"ebisu", sec:"rana", dir:"back", from:"恵比寿", to:"", via:"埼京線",
    opts:[{tag:"階段", legs:[{line:"JA",car:2,door:3}], own:true,
@@ -628,7 +619,7 @@ const BASE = [
 
   /* --- 中央線 --- */
   {id:"chuo-yotsuya", sec:"chuo", dir:"go", from:"高円寺", to:"四ツ谷", station:"yotsuya_jc_up",
-   warnNote:"中央線快速は土曜・休日は高円寺を通過します。休日は総武線各停で。" + GREEN_NOTE,
+   warnNote:"中央線快速は土曜・休日は高円寺を通過します。休日は総武線各停で。",
    opts:[
      {tag:"エスカレーター", legs:[{line:"JC",car:10,door:2}], own:true},
      {tag:"階段",           legs:[{line:"JC",car:8, door:4}], own:true},
@@ -639,21 +630,21 @@ const BASE = [
 
   {id:"chuo-shinjuku", sec:"chuo", dir:"go", from:"高円寺", to:"新宿", via:"中央線から南口",
    station:"shinjuku_jc_up",
-   warnNote:"中央線快速は土曜・休日は高円寺を通過します。休日は総武線各停で。" + GREEN_NOTE,
+   warnNote:"中央線快速は土曜・休日は高円寺を通過します。休日は総武線各停で。",
    opts:[{tag:"", legs:[{line:"JC",car:3,door:1}], own:true,
-          ref:"新宿7・8番線の南口エスカレーターは 3-1 との情報あり（未検証・出典は10両時代）"}]},
+          ref:"新宿7・8番線の南口エスカレーターは 3-1 との情報あり（未検証）"}]},
 
   {id:"chuo-tokyo", sec:"chuo", dir:"back", from:"東京", to:"高円寺", via:"中野乗り換え",
    station:"koenji_jb_w",
-   warnNote:"中央線快速は土曜・休日は高円寺を通過します。" + GREEN_NOTE,
+   warnNote:"中央線快速は土曜・休日は高円寺を通過します。",
    opts:[{tag:"エスカレーター", legs:[{line:"JC",car:3,door:5}], own:true,
           memo:"後ろの方。中野の乗り換えがエスカレーター。",
-          ref:"中野8番線のエスカレーターは 3-4 との情報あり（未検証・出典は10両時代）"}],
+          ref:"中野8番線のエスカレーターは 3-4 との情報あり（未検証）"}],
    tags:["乗り換え"],
    check:"元メモは「3-5」。中央線快速の普通車は4扉なので5番ドアがありません。"},
 
   {id:"chuo-koenji", sec:"chuo", dir:"back", from:"新宿", to:"高円寺",
-   warnNote:"中央線快速は土曜・休日は高円寺を通過します。" + GREEN_NOTE,
+   warnNote:"中央線快速は土曜・休日は高円寺を通過します。",
    opts:[
      {tag:"エスカレーター", legs:[{line:"JC",car:8,door:1}], own:true},
      {tag:"エレベーター",   legs:[{line:"JC",car:3,pos:"4号車寄り"}], own:true,
@@ -988,11 +979,6 @@ function stationBlock(st){
   box.appendChild(sum);
 
   if(st.sub) box.appendChild(el("div","stn-where", st.sub));
-  if(st.era){
-    const e = el("div","stn-era", st.era + "の数字");
-    if(st.era.indexOf("なし") >= 0) e.classList.add("old");
-    box.appendChild(e);
-  }
 
   const tbl = el("div","stn-rows");
   for(const it of st.items){
