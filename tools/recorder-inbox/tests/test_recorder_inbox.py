@@ -192,6 +192,97 @@ class BuildTest(unittest.TestCase):
         self.assertNotIn("</script>", html.split("<script>")[1].split("const DATA")[1].split(";")[0])
 
 
+class InterviewTest(unittest.TestCase):
+    RAW = {
+        "source": "plaud",
+        "source_id": "iv1",
+        "name": "08-19 【1次面接】山田様",
+        "start_at": "2026-08-19T06:21:59",
+        "duration": 3600000,
+        "kind": "interview",
+        "summary": "1次面接の記録。",
+        "candidate": {
+            "name": "山田 太郎",
+            "position": "キャピタリスト／東京",
+            "channel": "ビズリーチ（スカウト）",
+            "stage": "1次面接",
+        },
+        "interview": {"interviewers": ["水野", "堀江"], "next_step": "2次面接の日程調整"},
+        "todos": [{"text": "2次面接の日程を打診する", "priority": "A", "due": "2026-08-21"}],
+    }
+
+    def test_candidate_facts_render_as_a_table(self):
+        rec = ri.normalize_recording(self.RAW)
+        self.assertEqual(rec["candidate"]["name"], "山田 太郎")
+        self.assertEqual(rec["interview"]["interviewers"], "水野／堀江")
+        block = ri.render_recording_block(rec)
+        self.assertIn("## 候補者・選考", block)
+        self.assertIn("| 候補者 | 山田 太郎 |", block)
+        self.assertIn("| 面接官 | 水野／堀江 |", block)
+        self.assertIn("| 次アクション | 2次面接の日程調整 |", block)
+
+    def test_candidate_table_is_absent_without_the_fields(self):
+        rec = ri.normalize_recording({**self.RAW, "candidate": None, "interview": None})
+        self.assertNotIn("## 候補者・選考", ri.render_recording_block(rec))
+
+    def test_candidate_name_lands_in_frontmatter(self):
+        vault = Path(tempfile.mkdtemp())
+        try:
+            path = vault / "in.json"
+            path.write_text(json.dumps({"recordings": [self.RAW]}, ensure_ascii=False), encoding="utf-8")
+            args = ri.build_parser().parse_args(
+                ["--vault", str(vault), "build", "-i", str(path), "--today", "2026-08-21"]
+            )
+            args.func(args)
+            note = next((vault / "Recorder/Recordings/2026").glob("*.md"))
+            body = note.read_text(encoding="utf-8")
+            self.assertIn("candidate: 山田 太郎", body)
+            self.assertIn("position: ", body)
+        finally:
+            shutil.rmtree(vault, ignore_errors=True)
+
+
+class InboxCommandTest(unittest.TestCase):
+    def setUp(self):
+        self.vault = Path(tempfile.mkdtemp())
+        self.stdin = sys.stdin
+
+    def tearDown(self):
+        sys.stdin = self.stdin
+        shutil.rmtree(self.vault, ignore_errors=True)
+
+    def run_inbox(self, text, extra=()):
+        import io
+
+        sys.stdin = io.StringIO(text)
+        args = ri.build_parser().parse_args(
+            ["--vault", str(self.vault), "inbox", "--title", "チーム定例", "--at", "2026-08-22T09:30", *extra]
+        )
+        return args.func(args)
+
+    def test_pasted_text_is_saved_with_a_parseable_name(self):
+        self.run_inbox("[00:12] yuki: おはよう\n")
+        files = list((self.vault / "Recorder/Inbox").iterdir())
+        self.assertEqual([f.name for f in files], ["2026-08-22_0930_チーム定例.txt"])
+        rec = ri.normalize_recording(ri.switchbot_file_to_recording(files[0]))
+        self.assertEqual(rec["date"], "2026-08-22")
+        self.assertEqual(rec["time"], "09:30")
+        self.assertEqual(rec["title"], "チーム定例")
+
+    def test_existing_file_is_not_clobbered_without_force(self):
+        self.run_inbox("a\n")
+        with self.assertRaises(SystemExit):
+            self.run_inbox("b\n")
+        self.run_inbox("c\n", extra=["--force"])
+        self.assertEqual(
+            (self.vault / "Recorder/Inbox/2026-08-22_0930_チーム定例.txt").read_text(encoding="utf-8"), "c\n"
+        )
+
+    def test_empty_input_is_rejected(self):
+        with self.assertRaises(SystemExit):
+            self.run_inbox("   \n")
+
+
 class SwitchBotTest(unittest.TestCase):
     def setUp(self):
         self.dir = Path(tempfile.mkdtemp())
@@ -223,6 +314,20 @@ class SwitchBotTest(unittest.TestCase):
         self.assertEqual(rec["transcript"][0]["start_time"], 12000)
         self.assertEqual(rec["transcript"][1]["start_time"], 3930000)
         self.assertEqual(rec["transcript"][2]["content"], "ただの行")
+
+    def test_audio_files_are_reported_not_silently_skipped(self):
+        (self.dir / "rec.mp3").write_bytes(b"x")
+        (self.dir / "2026-08-19_0930_定例.txt").write_text("yuki: あ\n", encoding="utf-8")
+        args = ri.build_parser().parse_args(["switchbot", "--dir", str(self.dir)])
+        import contextlib
+        import io
+
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            args.func(args)
+        self.assertIn("音声ファイル 1 件は取り込めません", err.getvalue())
+        self.assertIn("rec.mp3", err.getvalue())
+        self.assertEqual(len(json.loads(out.getvalue())["recordings"]), 1)
 
     def test_json_export_passes_through(self):
         path = self.dir / "x.json"

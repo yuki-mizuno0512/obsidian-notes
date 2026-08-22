@@ -50,8 +50,18 @@ python3 tools/recorder-inbox/recorder_inbox.py imported --json --since <14日前
 python3 tools/recorder-inbox/recorder_inbox.py switchbot > /tmp/recorder-sb.json
 ```
 
-`Recorder/Inbox/` が空なら 0 件。SwitchBot アプリからの書き出しをそこに置くよう案内する。
+`Recorder/Inbox/` が空なら 0 件（定期実行では黙って PLAUD 分だけ進める）。
+ユーザーがテキストを貼ってきた場合は、先に置き場に保存してから読む。
+
+```bash
+python3 tools/recorder-inbox/recorder_inbox.py inbox --title "チーム定例" --at 2026-08-22T09:30
+# ← 標準入力に文字起こしテキストを渡す
+```
+
 文字起こしは入っているが要約・やること・おもいでは空なので、こちらで埋める。
+音声ファイルしか無い場合は文字起こしできないと伝える（このパイプラインは音声を扱わない）。
+書き出し元は SwitchBot アプリ、またはアプリのプロフィール画面からQRコードでログインする
+AI MindClip Web（PCブラウザ）。
 
 ### 4. 正規化JSONを組む
 
@@ -63,7 +73,11 @@ python3 tools/recorder-inbox/recorder_inbox.py switchbot > /tmp/recorder-sb.json
   他人の宿題は `owner` を明示。曖昧な言い切り（「そのうち」「またやる」）はやることにしない。
 - `memories` は日記・生活系で厚めに。情景と気持ちを、本人の言い回しを残して1〜3行ずつ。
 - `interview` は候補者名・所属・ポジションをそのまま残し、要約は事実ベースにする
-  （評価・推測を混ぜない）。
+  （評価・推測を混ぜない）。`candidate`（name / position / channel / stage / agency）と
+  `interview`（interviewers / next_step / scheduled）を埋めると「## 候補者・選考」の表になり、
+  候補者名とポジションは frontmatter にも入る。録音名に
+  「【1次面接】山田 祥生様 GCP-GCPX／東京【P職】（経由：求人媒体(ビズリーチ（スカウト）)）」の
+  ような情報が入っているので、そこから `stage` / `position` / `channel` を拾う。
 - `quotes` は言い回しに価値がある発言だけ。2〜4件で十分。
 - 文字起こしは取得できた範囲を `transcript` にそのまま渡す（別ノートに全文が書き出される）。
 
@@ -85,7 +99,22 @@ Artifact として公開する場合は、このファイルを `Artifact` ツ�
 **2回目以降は同じ `file_path` で publish し直す**（URLを変えない）。
 favicon は `🎙` で固定。
 
-### 7. 報告する
+### 7. Notion「MTG TODO」への登録候補を出す
+
+会議・面接由来で自分ボールのやることは、Notion「MTG TODO」DB に入れた方が完了管理が
+一本化される。**勝手に登録しない**。次の順で扱う。
+
+1. 候補を列挙して確認を取る（本文・優先度・MTG名・実施日をそのまま見せる）。
+2. 承認されたものだけ `mcp__Notion__notion-create-pages` で登録する。
+   - parent: `collection://d1d345c1-d9fd-4883-a38c-a807d355e256`（MTG TODO DB）
+   - プロパティ: `やること` / `優先度`（S・A・B・C）/ `MTG名` / `実施日`
+3. 登録したものは `Recorder/TODO.md` でチェックを入れて完了にする
+   （管理をNotionへ移す。二重管理にしない）。
+
+日記・生活系（`diary` / `life` / `memo`）のやることは Notion に出さず、
+`Recorder/TODO.md` で管理する。
+
+### 8. 報告する
 
 会話には次の形で短く返す。
 
@@ -99,7 +128,7 @@ favicon は `🎙` で固定。
 - 未処理があれば「PLAUD側の処理待ち。次回取り込む」と添える。
 - 期限切れがあれば、その項目だけ本文を引用して先に出す。
 - 面接・候補者の情報は vault の外（Slack・Notion・メール）へ自動で送らない。
-- Notion「MTG TODO」に入れた方がよい項目があれば、候補として列挙して確認を取る。
+- Notion に登録した項目があれば、その件数と登録先を1行で添える。
 
 ## 注意
 

@@ -279,6 +279,23 @@ def normalize_recording(raw: dict) -> dict:
         )
 
     kind = str(raw.get("kind") or "memo").strip().lower()
+
+    def flat(name: str, fields: tuple[str, ...]) -> dict:
+        block = raw.get(name) or {}
+        if not isinstance(block, dict):
+            return {}
+        out = {}
+        for field in fields:
+            value = block.get(field)
+            if isinstance(value, list):
+                value = "／".join(str(v).strip() for v in value if str(v).strip())
+            value = str(value or "").strip()
+            if value:
+                out[field] = value
+        return out
+
+    candidate = flat("candidate", ("name", "position", "channel", "stage", "agency"))
+    interview = flat("interview", ("interviewers", "next_step", "scheduled"))
     basename = truncate_bytes(
         f"{started:%Y-%m-%d-%H%M}-{slugify(title)}", MAX_BASENAME_BYTES
     ).rstrip("-._")
@@ -301,6 +318,8 @@ def normalize_recording(raw: dict) -> dict:
         "todos": todos,
         "quotes": quotes,
         "transcript": segments,
+        "candidate": candidate,
+        "interview": interview,
         "basename": basename,
         "note": f"Recorder/Recordings/{started:%Y}/{basename}.md",
         "transcript_note": (
@@ -404,6 +423,23 @@ def render_recording_block(rec: dict) -> str:
     if rec["people"]:
         head.append("／".join(rec["people"]))
     lines.append(" ・ ".join(p for p in head if p))
+
+    labels = {
+        "name": "候補者",
+        "position": "ポジション",
+        "channel": "経由",
+        "stage": "選考段階",
+        "agency": "エージェント",
+        "interviewers": "面接官",
+        "scheduled": "次回日程",
+        "next_step": "次アクション",
+    }
+    facts = [(labels[k], v) for k, v in rec["candidate"].items()] + [
+        (labels[k], v) for k, v in rec["interview"].items()
+    ]
+    if facts:
+        lines += ["", "## 候補者・選考", "", "| 項目 | 内容 |", "| --- | --- |"]
+        lines += [f"| {label} | {value} |" for label, value in facts]
 
     if rec["summary"]:
         lines += ["", "## 要約", "", rec["summary"].strip()]
@@ -648,6 +684,8 @@ def cmd_build(args: argparse.Namespace) -> int:
             "date": rec["date"],
             "duration": fmt_duration(rec["duration_ms"]),
             "people": rec["people"],
+            "candidate": rec["candidate"].get("name", ""),
+            "position": rec["candidate"].get("position", ""),
             "tags": rec["tags"],
         }
         heading = f"# {rec['date']} {rec['time']} {rec['title']}"
@@ -711,6 +749,7 @@ def cmd_build(args: argparse.Namespace) -> int:
 
 # ---------------------------------------------------------------- switchbot import
 SB_EXTS = {".txt", ".md", ".srt", ".vtt", ".json"}
+AUDIO_EXTS = {".mp3", ".m4a", ".wav", ".aac", ".ogg", ".opus", ".flac"}
 DATE_IN_NAME = re.compile(r"(20\d{2})[-_.]?(\d{2})[-_.]?(\d{2})")
 TIME_IN_NAME = re.compile(r"(?<!\d)([0-2]\d)[-_:]?([0-5]\d)(?!\d)")
 SRT_TIME = re.compile(r"(\d{2}):(\d{2}):(\d{2})[,.](\d{3})")
@@ -850,6 +889,14 @@ def cmd_switchbot(args: argparse.Namespace) -> int:
         print(json.dumps({"recordings": []}, ensure_ascii=False))
         return 0
     files = sorted(p for p in src.iterdir() if p.is_file() and p.suffix.lower() in SB_EXTS)
+    audio = sorted(p for p in src.iterdir() if p.is_file() and p.suffix.lower() in AUDIO_EXTS)
+    if audio:
+        print(
+            f"音声ファイル {len(audio)} 件は取り込めません（このツールは文字起こしをしない）: "
+            + ", ".join(p.name for p in audio[:5])
+            + "\n  SwitchBot アプリか AI MindClip Web の文字起こしテキストを書き出して置いてください。",
+            file=sys.stderr,
+        )
     recordings = [switchbot_file_to_recording(p) for p in files]
     print(json.dumps({"recordings": recordings}, ensure_ascii=False, indent=2))
     if args.move_processed and files:
@@ -859,6 +906,28 @@ def cmd_switchbot(args: argparse.Namespace) -> int:
             path.rename(done_dir / path.name)
         print(f"{len(files)} 件を {done_dir.name}/ へ移動しました。", file=sys.stderr)
     print(f"SwitchBot: {len(files)} 件を読み込みました。", file=sys.stderr)
+    return 0
+
+
+def cmd_inbox(args: argparse.Namespace) -> int:
+    """標準入力のテキストを Recorder/Inbox に正しい名前で保存する。"""
+    layout = Layout(find_vault(args.vault))
+    text = sys.stdin.read()
+    if not text.strip():
+        raise SystemExit("標準入力が空です（文字起こしテキストを渡してください）")
+    if args.at:
+        stamp = parse_dt(args.at, assume="jst")
+    else:
+        stamp = datetime.now(JST)
+    title = slugify(args.title or "メモ", limit=MAX_SLUG_BYTES)
+    name = f"{to_jst(stamp):%Y-%m-%d_%H%M}_{title}{args.ext}"
+    layout.inbox.mkdir(parents=True, exist_ok=True)
+    target = layout.inbox / name
+    if target.exists() and not args.force:
+        raise SystemExit(f"同名のファイルがあります: {layout.rel(target)}（--force で上書き）")
+    target.write_text(text, encoding="utf-8")
+    print(f"置きました: {layout.rel(target)}")
+    print("  次: recorder_inbox.py switchbot | recorder_inbox.py build -i -")
     return 0
 
 
@@ -948,6 +1017,13 @@ def build_parser() -> argparse.ArgumentParser:
     p_sb.add_argument("--dir", help="読み込み元（既定: Recorder/Inbox）")
     p_sb.add_argument("--move-processed", action="store_true", help="読み込んだファイルを _processed/ へ移動")
     p_sb.set_defaults(func=cmd_switchbot)
+
+    p_in = sub.add_parser("inbox", help="標準入力のテキストを Recorder/Inbox に保存")
+    p_in.add_argument("--title", "-t", help="録音のタイトル")
+    p_in.add_argument("--at", help="録音時刻 YYYY-MM-DDTHH:MM（JST、既定は現在）")
+    p_in.add_argument("--ext", default=".txt", choices=[".txt", ".md", ".srt", ".vtt"])
+    p_in.add_argument("--force", action="store_true", help="同名ファイルを上書き")
+    p_in.set_defaults(func=cmd_inbox)
 
     p_todo = sub.add_parser("todos", help="やることを一覧表示")
     p_todo.add_argument("--json", action="store_true")

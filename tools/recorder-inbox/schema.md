@@ -29,6 +29,18 @@
         },
         "文字列だけでも可"
       ],
+      "candidate": {                          // kind=interview のときだけ
+        "name": "山田 太郎",
+        "position": "キャピタリスト／東京【P職】",
+        "channel": "ビズリーチ（スカウト）",
+        "stage": "1次面接",
+        "agency": "—"
+      },
+      "interview": {
+        "interviewers": ["水野", "堀江"],       // 配列は ／ で連結される
+        "next_step": "2次面接の日程調整",
+        "scheduled": "2026-08-25 10:00"
+      },
       "quotes": [{ "speaker": "yuki", "text": "…", "at_ms": 150000 }],
       "transcript": [
         { "speaker": "Speaker 1", "content": "…", "start_time": 69820, "end_time": 99260 }
@@ -47,6 +59,10 @@
 | `memories` | 情景・気持ち・後で読み返したいこと | 業務上の決定事項 |
 | `todos` | 自分が動くこと（owner=self が既定） | 他人の宿題（owner を明示） |
 | `quotes` | そのままの言い回しに価値がある発言 | 要約で足りる発言 |
+
+`candidate` / `interview` は「## 候補者・選考」の表として出力され、`name` と `position` は
+frontmatter にも入る（Obsidian の検索・プロパティで引ける）。評価や推測は入れず、
+本人が言ったこと・決まったことだけを書く。
 
 `kind` は日記・生活系（`diary` / `life`）なら `memories` を厚めに、
 会議・面接（`meeting` / `interview`）なら `highlights` と `todos` を厚めに。

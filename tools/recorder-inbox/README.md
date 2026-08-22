@@ -17,6 +17,8 @@ python3 tools/recorder-inbox/recorder_inbox.py switchbot > /tmp/sb.json
 # 2. 正規化JSON からノート・日記・やることリストを生成
 python3 tools/recorder-inbox/recorder_inbox.py build -i /tmp/sb.json
 
+# 2.5 面接ノートは candidate / interview を渡すと「候補者・選考」表が付く（schema.md）
+
 # 3. 取り込み済みの確認 / やることの確認
 python3 tools/recorder-inbox/recorder_inbox.py imported --since 2026-08-01
 python3 tools/recorder-inbox/recorder_inbox.py todos
@@ -70,12 +72,32 @@ Recorder/
 
 ## SwitchBot について
 
-SwitchBot AIマインドクリップには公開APIが無いため、アプリから書き出したファイルを
-`Recorder/Inbox/` に置いて取り込む。対応形式は `.txt` `.md` `.srt` `.vtt` `.json`。
+SwitchBot AIマインドクリップには公開APIが無いため、アプリまたは AI MindClip Web から
+書き出したテキストを `Recorder/Inbox/` に置いて取り込む。対応形式は
+`.txt` `.md` `.srt` `.vtt` `.json`。
 
-ファイル名に日付（`2026-08-19` / `20260819`）と時刻（`0930` / `09-30`）が入っていれば
-それを録音時刻として使い、残りをタイトルにする。無ければファイルの更新時刻を使う。
+```bash
+# 貼り付けたテキストを正しい名前で置く（推奨）
+pbpaste | python3 tools/recorder-inbox/recorder_inbox.py inbox   --title "チーム定例" --at 2026-08-22T09:30
+```
+
+ファイル名は `YYYY-MM-DD_HHMM_タイトル.txt` の形にしておけば、日付・時刻・タイトルを
+そこから読む（`20260819-0930` のような形でも可）。日付が無ければファイルの更新時刻を使う。
 `--move-processed` を付けると読み込んだファイルを `Inbox/_processed/` へ移す。
+
+文字起こし本文は次のどれでも解析できる。
+
+```
+[00:12] yuki: 冒頭のあいさつ      # [時刻] 話者: 本文
+yuki: 冒頭のあいさつ              # 話者: 本文
+（1:05:30）田中: 締めの確認        # 全角括弧・時分秒もOK
+1                                 # .srt / .vtt はそのまま
+00:00:01,000 --> 00:00:04,500
+yuki: おはようございます
+```
+
+音声ファイル（mp3/m4a など）を置いても文字起こしはしない。見つけた場合は黙って
+無視せず警告するので、アプリ側の文字起こしテキストを書き出して置き直す。
 
 ## テスト
 
