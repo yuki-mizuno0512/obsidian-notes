@@ -1,0 +1,812 @@
+<title>TA成熟度診断</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap">
+
+<style>
+  :root {
+    --ground:    #EFF2F1;
+    --surface:   #FFFFFF;
+    --surface-2: #E7ECEA;
+    --ink:       #16242A;
+    --ink-2:     #4A5C60;
+    --ink-3:     #7D8D8F;
+    --line:      #D3DBD9;
+    --line-2:    #BCC8C5;
+    --accent:    #0E6B64;
+    --accent-ink:#FFFFFF;
+    --accent-wash:#E0EDEB;
+    --stage-1:   #9B6440;
+    --stage-2:   #A8801F;
+    --stage-3:   #0E6B64;
+    --alert:     #A63D26;
+    --alert-wash:#F6E7E2;
+
+    --display: "Zen Old Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+    --body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+    --mono: "Roboto Mono", ui-monospace, "SFMono-Regular", monospace;
+
+    --measure: 34rem;
+    --radius: 3px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:    #111917;
+      --surface:   #18211F;
+      --surface-2: #212B29;
+      --ink:       #E4E9E6;
+      --ink-2:     #A7B4B1;
+      --ink-3:     #798683;
+      --line:      #2C3634;
+      --line-2:    #3D4A47;
+      --accent:    #5CBFB3;
+      --accent-ink:#0B1614;
+      --accent-wash:#1B2E2B;
+      --stage-1:   #C08B63;
+      --stage-2:   #CFA742;
+      --stage-3:   #5CBFB3;
+      --alert:     #E08063;
+      --alert-wash:#2E1F1A;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:    #111917;
+    --surface:   #18211F;
+    --surface-2: #212B29;
+    --ink:       #E4E9E6;
+    --ink-2:     #A7B4B1;
+    --ink-3:     #798683;
+    --line:      #2C3634;
+    --line-2:    #3D4A47;
+    --accent:    #5CBFB3;
+    --accent-ink:#0B1614;
+    --accent-wash:#1B2E2B;
+    --stage-1:   #C08B63;
+    --stage-2:   #CFA742;
+    --stage-3:   #5CBFB3;
+    --alert:     #E08063;
+    --alert-wash:#2E1F1A;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: 6rem;
+  }
+
+  .wrap {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin: 0;
+  }
+
+  /* ---------- masthead ---------- */
+
+  header.masthead {
+    border-bottom: 1px solid var(--line);
+    padding: 3.5rem 0 2.5rem;
+  }
+  header.masthead h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(2rem, 6vw, 2.875rem);
+    line-height: 1.25;
+    letter-spacing: 0.02em;
+    text-wrap: balance;
+    margin: 0.75rem 0 0;
+  }
+  .lede {
+    max-width: var(--measure);
+    color: var(--ink-2);
+    font-size: 0.9375rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    margin-top: 1.5rem;
+  }
+  .lede p { margin: 0; }
+  .lede strong { color: var(--ink); font-weight: 700; }
+
+  .howto {
+    margin-top: 2rem;
+    border-left: 2px solid var(--line-2);
+    padding-left: 1rem;
+    font-size: 0.8125rem;
+    color: var(--ink-3);
+    max-width: var(--measure);
+  }
+
+  /* ---------- axis sections ---------- */
+
+  main { display: flex; flex-direction: column; }
+
+  .axis {
+    border-bottom: 1px solid var(--line);
+    padding: 2.75rem 0;
+  }
+  .axis-head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1.75rem;
+    max-width: var(--measure);
+  }
+  .axis-head h2 {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 1.375rem;
+    letter-spacing: 0.02em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .axis-arrow {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--ink-3);
+    letter-spacing: 0.02em;
+  }
+
+  .q {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    padding: 1.125rem 0;
+    border-top: 1px solid var(--line);
+  }
+  .q:first-of-type { border-top: none; }
+
+  .q-text {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    max-width: var(--measure);
+  }
+  .q-num {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--ink-3);
+    flex: none;
+    padding-top: 0.15em;
+  }
+  .q-body { font-size: 0.9375rem; line-height: 1.7; }
+
+  fieldset.scale {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.375rem;
+    max-width: 30rem;
+  }
+  fieldset.scale legend {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .opt input {
+    position: absolute;
+    opacity: 0;
+    width: 0; height: 0;
+  }
+  .opt label {
+    display: block;
+    text-align: center;
+    font-size: 0.75rem;
+    line-height: 1.3;
+    padding: 0.5rem 0.25rem;
+    border: 1px solid var(--line-2);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+    user-select: none;
+  }
+  .opt label:hover { border-color: var(--accent); color: var(--ink); }
+  .opt input:checked + label {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 500;
+  }
+  .opt input:focus-visible + label {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* ---------- progress bar ---------- */
+
+  .dock {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    background: var(--surface);
+    border-top: 1px solid var(--line-2);
+    padding: 0.875rem 0;
+    z-index: 10;
+  }
+  .dock-inner {
+    max-width: 46rem;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .meter {
+    flex: 1;
+    height: 4px;
+    background: var(--surface-2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .meter-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    transition: width 220ms ease;
+  }
+  .count {
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-2);
+    flex: none;
+  }
+  button.run {
+    font-family: var(--body);
+    font-size: 0.875rem;
+    font-weight: 700;
+    padding: 0.5rem 1.25rem;
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: var(--accent-ink);
+    cursor: pointer;
+    flex: none;
+    transition: opacity 120ms ease;
+  }
+  button.run[disabled] {
+    background: transparent;
+    color: var(--ink-3);
+    border-color: var(--line-2);
+    cursor: not-allowed;
+  }
+  button.run:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---------- results ---------- */
+
+  #result[hidden] { display: none; }
+  #result { padding: 3rem 0 4rem; }
+
+  .verdict {
+    background: var(--surface);
+    border: 1px solid var(--line-2);
+    border-radius: var(--radius);
+    padding: 2rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .verdict h3 {
+    font-family: var(--display);
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 0.02em;
+    text-wrap: balance;
+  }
+  .verdict p { margin: 0; color: var(--ink-2); font-size: 0.9375rem; max-width: var(--measure); }
+  .score-line {
+    font-family: var(--mono);
+    font-size: 0.8125rem;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ladder {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  .rung {
+    border-top: 3px solid var(--line-2);
+    padding-top: 0.625rem;
+    font-size: 0.75rem;
+    color: var(--ink-3);
+    line-height: 1.5;
+  }
+  .rung b { display: block; font-size: 0.875rem; font-weight: 700; color: var(--ink-3); }
+  .rung[data-on="1"] { border-top-color: var(--st); }
+  .rung[data-on="1"] b { color: var(--st); }
+  .rung[data-on="1"] { color: var(--ink-2); }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin: 3rem 0 1.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .bars { display: flex; flex-direction: column; gap: 1.125rem; }
+  .bar-row { display: flex; flex-direction: column; gap: 0.4rem; }
+  .bar-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    font-size: 0.875rem;
+  }
+  .bar-name { font-weight: 500; }
+  .bar-val {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-3);
+    flex: none;
+  }
+  .bar-track {
+    height: 8px;
+    background: var(--surface-2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .bar-fill[data-low="1"] { background: var(--alert); }
+  .bar-note { font-size: 0.8125rem; color: var(--ink-2); max-width: var(--measure); }
+
+  .flags { display: flex; flex-direction: column; gap: 1rem; }
+  .flag {
+    background: var(--surface);
+    border: 1px solid var(--line-2);
+    border-left: 3px solid var(--alert);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.375rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .flag.major { background: var(--alert-wash); }
+  .flag h4 {
+    margin: 0;
+    font-family: var(--display);
+    font-size: 1.0625rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .flag p { margin: 0; font-size: 0.875rem; color: var(--ink-2); max-width: var(--measure); }
+  .flag .tag {
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--alert);
+  }
+
+  ol.actions {
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
+    counter-reset: act;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  ol.actions li {
+    counter-increment: act;
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: 0.75rem;
+    align-items: baseline;
+    font-size: 0.9375rem;
+    max-width: var(--measure);
+  }
+  ol.actions li::before {
+    content: counter(act, decimal-leading-zero);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+  }
+
+  footer.foot {
+    border-top: 1px solid var(--line);
+    margin-top: 3.5rem;
+    padding: 2rem 0 1rem;
+    font-size: 0.75rem;
+    color: var(--ink-3);
+    max-width: var(--measure);
+  }
+
+  @media (max-width: 40rem) {
+    .ladder { grid-template-columns: 1fr; }
+    .dock-inner { flex-wrap: wrap; }
+    .count { order: 1; }
+    .meter { order: 0; flex-basis: 100%; }
+    button.run { order: 2; margin-left: auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <p class="eyebrow">Talent Acquisition / 自己診断</p>
+    <h1>TA成熟度診断</h1>
+    <div class="lede">
+      <p>採用がうまくいかなくなるとき、原因が「ずさんな経営」であることはほとんどありません。<strong>優秀な経営陣がいて、専任の採用チームが5人以上いて、KPIも回っている会社で同じことが起きます。</strong></p>
+      <p>ある投資先企業では、100人規模の採用を追いかけるうちに、複数のエージェントから「あの会社への紹介は控えたい」と言われる状態になっていました。数は管理されていた。質を見る人がいなかった。それだけです。</p>
+      <p>この診断は、その構造に自社がどれだけ近いかを18問で測ります。</p>
+    </div>
+    <p class="howto">経営者・採用責任者が単独で回答するより、経営側と採用実務側がそれぞれ回答して差分を見るほうが、はるかに多くのことが分かります。所要5分。回答はこのページの外に送信されません。</p>
+  </header>
+
+  <main id="form"></main>
+
+  <section id="result" hidden aria-live="polite"></section>
+
+  <footer class="foot">
+    <p>設問は、投資先支援の現場で繰り返し観測された失敗パターンをもとに構成しています。スコアは優劣の評価ではなく、次に手を入れる場所を特定するためのものです。</p>
+  </footer>
+</div>
+
+<div class="dock">
+  <div class="dock-inner">
+    <div class="meter"><div class="meter-fill" id="meterFill"></div></div>
+    <span class="count" id="count">0 / 18</span>
+    <button class="run" id="run" disabled>診断する</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var AXES = [
+    {
+      key: "search",
+      name: "探索スタンス",
+      arrow: "受け身 → 攻め",
+      low: "「良い人がいれば」は要件ではありません。曖昧な依頼は、エージェントにも現場にも同じ曖昧さで伝わります。",
+      qs: [
+        "採用要件を「良い人がいれば」ではなく、具体的な人物像と評価基準の言葉で伝えている",
+        "自社から候補者へ能動的に接点をつくる活動が、毎週の定例業務として存在する",
+        "誰に会うか・どう口説くかの主導権を、エージェントではなく自社が握っている"
+      ]
+    },
+    {
+      key: "agent",
+      name: "エージェント・リレーション",
+      arrow: "業者化 → ファン化",
+      low: "案件が多すぎると、エージェント側は「記憶に残る案件」しか推せません。依頼先を増やすほど紹介が減るのはこのためです。",
+      qs: [
+        "依頼するエージェントの数を意図的に絞り、1社ごとの関係構築に時間を使っている",
+        "見送り・通過の理由を、毎回そのエージェントに具体的な言葉でフィードバックしている",
+        "主要なエージェント担当者にとって、自社が「第一想起される数社」に入っている手応えがある"
+      ]
+    },
+    {
+      key: "passive",
+      name: "潜在層アプローチ",
+      arrow: "顕在層 → 近距離層",
+      low: "転職市場に出ている層だけを見ていると、他社と同じ母集団を取り合うことになります。動くのは「機会があれば話は聞く」層です。",
+      qs: [
+        "「今は転職を考えていないが、機会があれば話は聞く」層と実際に接点を持てている",
+        "最初の接点として、選考ではなく「まず話を聞いてもらう」形の場を用意している",
+        "事業の魅力や現場の温度感を、伝聞ではなく現場のメンバーが直接候補者に伝える機会がある"
+      ]
+    },
+    {
+      key: "pool",
+      name: "タレント名鑑",
+      arrow: "個人の記憶 → 会社の資産",
+      low: "会った人の情報が個人の記憶にしか残らない限り、採用活動は毎回ゼロから始まります。名鑑として残って初めて資産になります。",
+      qs: [
+        "「いつか採りたい人」のリストが、個人の記憶ではなく共有された形で存在している",
+        "そのリストの人たちと、足元の採用ニーズの有無に関わらず定期的に接点を持っている",
+        "過去に会った候補者（見送り・辞退を含む）の情報が、後から検索できる状態で残っている"
+      ]
+    },
+    {
+      key: "quality",
+      name: "クオリティ管理",
+      arrow: "KPI管理 → 質の管理",
+      low: "数の管理は仕組みで回りますが、質の管理は人が見ないと回りません。ここが薄いまま数を追うと、母集団は増えながら採用は悪化します。",
+      qs: [
+        "母集団の「数」だけでなく「質」を定義した指標があり、定点で見ている",
+        "面接の評価基準が面接官の間で揃っており、ズレたときに補正する場がある",
+        "紹介数・面談数のKPIが未達でも、基準を下げた採用はしないという合意が経営にある"
+      ]
+    },
+    {
+      key: "exec",
+      name: "経営との接続",
+      arrow: "TAの孤立 → 経営との接続",
+      low: "経営と接続していない採用チームは、優秀であるほど速く走り、気づいたときには誰も止められなくなります。",
+      qs: [
+        "採用の意思決定に、経営陣が定例で（採用が炎上したときだけでなく）関与している",
+        "採用チームの活動が、事業計画上の必要人員とタイミングに紐づいて説明できる",
+        "採用責任者が、現場の採用オペレーションと経営の議論の両方に接続できている"
+      ]
+    }
+  ];
+
+  var LABELS = ["ない", "あまり", "やや", "ある"];
+  var FULL = ["当てはまらない", "あまり当てはまらない", "やや当てはまる", "当てはまる"];
+
+  var STAGES = [
+    { name: "オペレーション型", desc: "採用は「処理」として回っています。母集団は他者が運んでくるものであり、自社の意思が入る余地が構造的に小さい状態です。" },
+    { name: "エンゲージメント型", desc: "関係構築の意識は入っています。ただし属人的な努力に支えられており、担当者が変われば元に戻る強度です。" },
+    { name: "ダイレクトリクルーティング型", desc: "自社で探し、自社で口説き、出会いを資産として残せています。ここから先は、質の基準を落とさずに量を伸ばせるかどうかの勝負です。" }
+  ];
+
+  var form = document.getElementById("form");
+  var answers = {};
+  var total = 0;
+
+  AXES.forEach(function (axis, ai) {
+    var sec = document.createElement("section");
+    sec.className = "axis";
+
+    var head = document.createElement("div");
+    head.className = "axis-head";
+    head.innerHTML =
+      '<p class="eyebrow">軸 ' + (ai + 1) + ' / 6</p>' +
+      '<h2></h2>' +
+      '<span class="axis-arrow"></span>';
+    head.querySelector("h2").textContent = axis.name;
+    head.querySelector(".axis-arrow").textContent = axis.arrow;
+    sec.appendChild(head);
+
+    axis.qs.forEach(function (text, qi) {
+      total++;
+      var id = axis.key + "_" + qi;
+      var num = ai * 3 + qi + 1;
+
+      var row = document.createElement("div");
+      row.className = "q";
+
+      var qt = document.createElement("div");
+      qt.className = "q-text";
+      var n = document.createElement("span");
+      n.className = "q-num";
+      n.textContent = "Q" + (num < 10 ? "0" + num : num);
+      var b = document.createElement("span");
+      b.className = "q-body";
+      b.textContent = text;
+      qt.appendChild(n);
+      qt.appendChild(b);
+      row.appendChild(qt);
+
+      var fs = document.createElement("fieldset");
+      fs.className = "scale";
+      var lg = document.createElement("legend");
+      lg.textContent = "Q" + num + " " + text;
+      fs.appendChild(lg);
+
+      LABELS.forEach(function (lab, v) {
+        var wrap = document.createElement("span");
+        wrap.className = "opt";
+        var input = document.createElement("input");
+        input.type = "radio";
+        input.name = id;
+        input.id = id + "_" + v;
+        input.value = String(v);
+        var label = document.createElement("label");
+        label.setAttribute("for", id + "_" + v);
+        label.textContent = lab;
+        label.title = FULL[v];
+        input.addEventListener("change", function () {
+          answers[id] = v;
+          sync();
+        });
+        wrap.appendChild(input);
+        wrap.appendChild(label);
+        fs.appendChild(wrap);
+      });
+
+      row.appendChild(fs);
+      sec.appendChild(row);
+    });
+
+    form.appendChild(sec);
+  });
+
+  var meterFill = document.getElementById("meterFill");
+  var count = document.getElementById("count");
+  var run = document.getElementById("run");
+
+  function answered() { return Object.keys(answers).length; }
+
+  function sync() {
+    var n = answered();
+    meterFill.style.width = (n / total * 100) + "%";
+    count.textContent = n + " / " + total;
+    run.disabled = n < total;
+  }
+
+  function axisScore(axis) {
+    var s = 0;
+    for (var i = 0; i < axis.qs.length; i++) s += answers[axis.key + "_" + i] || 0;
+    return s;
+  }
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+
+  function render() {
+    var scores = {};
+    AXES.forEach(function (a) { scores[a.key] = axisScore(a); });
+    var sum = AXES.reduce(function (acc, a) { return acc + scores[a.key]; }, 0);
+    var max = total * 3;
+
+    var stage = sum <= 17 ? 0 : (sum <= 35 ? 1 : 2);
+
+    var out = document.getElementById("result");
+    out.innerHTML = "";
+
+    /* --- verdict --- */
+    var v = el("div", "verdict");
+    v.appendChild(el("p", "eyebrow", "診断結果"));
+    v.appendChild(el("h3", null, STAGES[stage].name));
+    v.appendChild(el("p", null, STAGES[stage].desc));
+    v.appendChild(el("span", "score-line", "総合 " + sum + " / " + max));
+
+    var ladder = el("div", "ladder");
+    STAGES.forEach(function (s, i) {
+      var r = el("div", "rung");
+      r.style.setProperty("--st", "var(--stage-" + (i + 1) + ")");
+      r.setAttribute("data-on", i === stage ? "1" : "0");
+      var bb = el("b", null, s.name);
+      r.appendChild(bb);
+      r.appendChild(document.createTextNode(i === stage ? "現在地" : ""));
+      ladder.appendChild(r);
+    });
+    v.appendChild(ladder);
+    out.appendChild(v);
+
+    /* --- axis bars --- */
+    out.appendChild(el("p", "section-label", "軸ごとの現在地"));
+    var bars = el("div", "bars");
+    AXES.forEach(function (a) {
+      var sc = scores[a.key];
+      var isLow = sc <= 4;
+      var row = el("div", "bar-row");
+      var top = el("div", "bar-top");
+      top.appendChild(el("span", "bar-name", a.name));
+      top.appendChild(el("span", "bar-val", sc + " / 9"));
+      row.appendChild(top);
+      var track = el("div", "bar-track");
+      var fill = el("div", "bar-fill");
+      fill.setAttribute("data-low", isLow ? "1" : "0");
+      track.appendChild(fill);
+      row.appendChild(track);
+      if (isLow) row.appendChild(el("p", "bar-note", a.low));
+      bars.appendChild(row);
+      requestAnimationFrame(function () { fill.style.width = (sc / 9 * 100) + "%"; });
+    });
+    out.appendChild(bars);
+
+    /* --- flags --- */
+    var flags = [];
+
+    var drive = (scores.search + scores.passive) / 2;
+    var brake = (scores.quality + scores.exec) / 2;
+
+    if (drive >= 6 && brake <= 4.5) {
+      flags.push({
+        major: true,
+        tag: "最優先",
+        title: "アクセルは踏めている。ブレーキと接続がない",
+        body: "探索は動いているのに、質を見る仕組みと経営との接続が追いついていません。これは採用が弱い会社ではなく、採用を頑張っている会社に起きるパターンです。この状態のまま母集団を増やすと、現場の疲弊とエージェントからの評判低下が同時に進みます。増やす前に、質の基準と経営レビューを先に置いてください。"
+      });
+    }
+    if (scores.agent <= 4) {
+      flags.push({
+        tag: "エージェント",
+        title: "エージェントの業者化が進んでいます",
+        body: "依頼先が多いほど紹介が増えるように見えますが、実際には逆です。エージェント側から見た自社は「多数あるクライアントの1社」になり、記憶に残る案件から外れます。数を増やす前に、フィードバックを返す相手を絞ってください。"
+      });
+    }
+    if (scores.quality <= 4 && scores.agent >= 6) {
+      flags.push({
+        tag: "質",
+        title: "関係はあるのに、基準がありません",
+        body: "エージェントとの関係は築けています。ただ、渡している基準が曖昧なままだと、良い関係が「基準の合わない候補者が丁寧に届く」状態に変わります。関係構築の次は、評価基準の言語化です。"
+      });
+    }
+    if (scores.pool <= 4) {
+      flags.push({
+        tag: "資産",
+        title: "出会いが資産になっていません",
+        body: "見送った候補者、辞退された候補者、いつか採りたい人。これらが個人の記憶にしか残っていないと、次のポジションが空いたときにまたゼロから探すことになります。名鑑として残っている状態そのものが、他社が真似できない資産です。"
+      });
+    }
+    if (scores.exec <= 4) {
+      flags.push({
+        tag: "構造",
+        title: "採用が経営から切り離されています",
+        body: "採用チームが優秀であるほど、接続がないまま速く走ります。経営が関与するのが「炎上したとき」だけになっていないか、定例の議題を確認してください。"
+      });
+    }
+    if (scores.passive <= 4 && scores.search >= 6) {
+      flags.push({
+        tag: "母集団",
+        title: "攻めている先が、他社と同じ場所です",
+        body: "能動的には動けていますが、対象が転職顕在層に寄っています。差がつくのは「機会があれば話は聞く」層に、選考ではない形で接点を持てるかどうかです。"
+      });
+    }
+
+    if (flags.length) {
+      out.appendChild(el("p", "section-label", "検出されたパターン"));
+      var fw = el("div", "flags");
+      flags.forEach(function (f) {
+        var c = el("div", "flag" + (f.major ? " major" : ""));
+        c.appendChild(el("span", "tag", f.tag));
+        c.appendChild(el("h4", null, f.title));
+        c.appendChild(el("p", null, f.body));
+        fw.appendChild(c);
+      });
+      out.appendChild(fw);
+    }
+
+    /* --- next steps: two weakest axes --- */
+    var ranked = AXES.slice().sort(function (a, b) { return scores[a.key] - scores[b.key]; });
+    var STEPS = {
+      search: "採用要件を1ポジション選び、「どんな成果を出せる人か」「何ができれば合格か」を現場と1時間で書き切る。エージェントへの依頼文をそれで差し替える。",
+      agent: "依頼中のエージェントを紹介実績で並べ、上位3社に絞る。その3社に対して、直近の見送り理由をまとめて返す場を今月中に設定する。",
+      passive: "「選考ではなく話を聞くだけ」の面談枠を月4件つくり、現場のメンバーを1人同席させる。",
+      pool: "会いたい人リストを1枚のシートで始める。項目は、名前・会った文脈・最終接点日・次の接点予定の4つで十分。",
+      quality: "母集団の質を測る指標を1つだけ決める（例：一次面接通過率）。それを毎週の採用定例の先頭に置く。",
+      exec: "経営会議に採用の定例枠を15分つくる。報告する内容は数字ではなく、「今週の意思決定が必要なこと」に限定する。"
+    };
+    out.appendChild(el("p", "section-label", "最初の2週間でやること"));
+    var ol = el("ol", "actions");
+    ranked.slice(0, 3).forEach(function (a) {
+      ol.appendChild(el("li", null, STEPS[a.key]));
+    });
+    out.appendChild(ol);
+
+    out.hidden = false;
+    out.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  run.addEventListener("click", render);
+  sync();
+})();
+</script>
